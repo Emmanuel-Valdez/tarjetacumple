@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+.astro/
+build/
+out/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Database
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OpenSpec / tooling (keep openspec/, ignore caches)
+.opencode/node_modules/
