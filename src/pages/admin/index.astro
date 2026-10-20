@@ -1,0 +1,86 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { verifySession } from '../../lib/auth';
+
+const match = Astro.request.headers.get('cookie')?.match(/(?:^|;\s*)admin_session=([^;]+)/);
+const role = verifySession(match ? decodeURIComponent(match[1]) : undefined);
+if (!role) return Astro.redirect('/admin/login');
+---
+<Layout title="Admin">
+  <section class="mx-auto max-w-5xl px-4 py-8">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold text-neon-magenta">Panel admin · {role}</h1>
+      <button id="logout" class="text-sm text-gray-400 hover:text-white">Salir</button>
+    </div>
+
+    <h2 class="text-xl font-bold text-neon-cyan mb-3">RSVPs</h2>
+    <div class="mb-3 flex gap-2">
+      <button id="copy-list" class="rounded bg-neon-green px-3 py-1 text-black text-sm font-semibold">Copiar lista</button>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="text-left text-gray-400">
+          <tr><th class="py-2">Nombre</th><th>Acompañantes</th>{role === 'organizer' && <th>Dedicatoria</th>}<th>Fecha</th><th></th></tr>
+        </thead>
+        <tbody id="rsvp-body"></tbody>
+      </table>
+    </div>
+
+    <h2 class="text-xl font-bold text-neon-cyan mt-8 mb-3">Subir foto</h2>
+    <form id="upload-form" class="flex flex-col gap-2 sm:flex-row">
+      <input type="file" name="file" accept="image/*" required class="text-sm" />
+      <input name="alt" placeholder="Alt" class="rounded bg-gray-900 px-3 py-2 border border-gray-700 focus:border-neon-cyan focus:outline-none" />
+      <button class="rounded bg-neon-magenta px-4 py-2 text-black font-semibold">Subir</button>
+    </form>
+    <p id="upload-status" class="text-sm mt-2" role="status"></p>
+  </section>
+
+  <script>
+    const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+
+    async function loadRsvps() {
+      const r = await fetch('/api/admin/rsvps');
+      if (!r.ok) { window.location.href = '/admin/login'; return; }
+      const j = await r.json();
+      const tbody = document.getElementById('rsvp-body')!;
+      tbody.innerHTML = '';
+      for (const r of j.rsvps) {
+        const tr = document.createElement('tr');
+        tr.className = 'border-t border-gray-800';
+        tr.innerHTML = `<td class="py-2">${esc(r.name)}</td><td>${r.companions}</td>${j.role === 'organizer' ? `<td class="max-w-xs truncate">${esc(r.dedication)}</td>` : ''}<td>${new Date(r.createdAt).toLocaleString()}</td><td><button data-id="${r.id}" class="del text-red-400 hover:text-red-300">borrar</button></td>`;
+        tbody.appendChild(tr);
+      }
+      tbody.querySelectorAll('.del').forEach((b) => {
+        b.addEventListener('click', async () => {
+          const id = (b as HTMLElement).dataset.id;
+          await fetch(`/api/admin/rsvps?id=${id}`, { method: 'DELETE' });
+          loadRsvps();
+        });
+      });
+    }
+    loadRsvps();
+
+    document.getElementById('copy-list')!.addEventListener('click', async () => {
+      const r = await fetch('/api/admin/rsvps');
+      const j = await r.json();
+      const text = j.rsvps.map((x: any) => `${x.name}\t${x.companions}\t${x.dedication || ''}`).join('\n');
+      await navigator.clipboard.writeText(text);
+      alert('Copiado');
+    });
+
+    document.getElementById('logout')!.addEventListener('click', async () => {
+      await fetch('/api/admin/logout', { method: 'POST' });
+      window.location.href = '/admin/login';
+    });
+
+    const uploadForm = document.getElementById('upload-form') as HTMLFormElement;
+    const uploadStatus = document.getElementById('upload-status')!;
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(uploadForm);
+      const r = await fetch('/api/admin/photos', { method: 'POST', body: fd });
+      if (r.ok) { uploadStatus.textContent = 'Subida OK'; uploadForm.reset(); }
+      else { uploadStatus.textContent = 'Error al subir'; }
+    });
+  </script>
+</Layout>

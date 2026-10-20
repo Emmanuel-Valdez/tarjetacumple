@@ -4,11 +4,14 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
+      - HOST=0.0.0.0
       - PORT=3000
       - DATABASE_PATH=/data/db.sqlite
       - UPLOADS_PATH=/data/uploads
-      - ADMIN_USER=${ADMIN_USER}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - ADMIN_JULI_USER=${ADMIN_JULI_USER}
+      - ADMIN_JULI_PASSWORD=${ADMIN_JULI_PASSWORD}
+      - ADMIN_ORGANIZER_USER=${ADMIN_ORGANIZER_USER}
+      - ADMIN_ORGANIZER_PASSWORD=${ADMIN_ORGANIZER_PASSWORD}
       - SESSION_SECRET=${SESSION_SECRET}
       - PUBLIC_SITE_URL=${PUBLIC_SITE_URL}
     volumes:

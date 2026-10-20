@@ -1,0 +1,32 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="Admin login">
+  <section class="flex min-h-screen items-center justify-center px-4">
+    <form id="login-form" class="w-full max-w-sm space-y-4 rounded bg-gray-900 p-6">
+      <h1 class="text-2xl font-bold text-neon-magenta">Admin</h1>
+      <div>
+        <label for="username" class="block text-sm mb-1">Usuario</label>
+        <input id="username" name="username" required class="w-full rounded bg-gray-800 px-3 py-2 border border-gray-700 focus:border-neon-cyan focus:outline-none" />
+      </div>
+      <div>
+        <label for="password" class="block text-sm mb-1">Contraseña</label>
+        <input id="password" name="password" type="password" required class="w-full rounded bg-gray-800 px-3 py-2 border border-gray-700 focus:border-neon-cyan focus:outline-none" />
+      </div>
+      <button type="submit" class="w-full rounded bg-neon-magenta px-4 py-2 text-black font-semibold">Entrar</button>
+      <p id="login-status" class="text-sm text-red-400" role="status"></p>
+    </form>
+  </section>
+  <script>
+    const form = document.getElementById('login-form') as HTMLFormElement;
+    const status = document.getElementById('login-status')!;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const payload = { username: String(fd.get('username') || ''), password: String(fd.get('password') || '') };
+      const r = await fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (r.ok) { window.location.href = '/admin'; }
+      else { status.textContent = 'Credenciales inválidas'; }
+    });
+  </script>
+</Layout>
