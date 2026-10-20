@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cinema-black: #0a0a0f;
+  --color-cinema-gold: #d4af37;
+  --color-neon-cyan: #00f0ff;
+  --color-neon-magenta: #ff00ff;
+  --color-neon-green: #39ff14;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body {
+    background-color: var(--color-cinema-black);
+    color: #e5e5e5;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+}
+
+.neon-text {
+  text-shadow: 0 0 6px currentColor, 0 0 12px currentColor;
+}

@@ -1,0 +1,20 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_PATH=/data/db.sqlite
+      - UPLOADS_PATH=/data/uploads
+      - ADMIN_USER=${ADMIN_USER}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - PUBLIC_SITE_URL=${PUBLIC_SITE_URL}
+    volumes:
+      - juli30_data:/data
+    ports:
+      - "127.0.0.1:3000:3000"
+
+volumes:
+  juli30_data:

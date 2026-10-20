@@ -18,6 +18,11 @@ out/
 *.db-journal
 *.db-wal
 *.db-shm
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+data/
 
 # .NET
 bin/

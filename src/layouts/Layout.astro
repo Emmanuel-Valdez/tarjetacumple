@@ -1,0 +1,20 @@
+---
+import '../styles/global.css';
+interface Props { title?: string; }
+const { title = 'Juli cumple 30' } = Astro.props;
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen bg-cinema-black text-gray-100 antialiased">
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-3 focus:py-2 focus:bg-neon-cyan focus:text-black focus:rounded">Saltar al contenido</a>
+    <main id="main">
+      <slot />
+    </main>
+  </body>
+</html>
