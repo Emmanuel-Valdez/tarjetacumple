@@ -24,7 +24,7 @@ out/
 *.sqlite-wal
 *.sqlite-shm
 
-# Fotos fuente (los .webp optimizados de public/photos/ SI se versionan)
+# Fotos fuente (los .webp optimizados de public/img/ SI se versionan)
 src/img/
 
 # .NET

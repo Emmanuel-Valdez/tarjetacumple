@@ -1,13 +1,20 @@
 // Uso: node scripts/prepare-photos.mjs
-// Convierte las fotos de src/img a WebP optimizado en public/photos/ y escribe
-// src/data/gallery.ts con el manifiesto. Correr de nuevo cuando cambien las fotos.
+// Convierte las fotos y fondos de src/img a WebP optimizado en public/img/ y
+// escribe src/data/gallery.ts con el manifiesto. Correr de nuevo cuando cambien.
 import sharp from 'sharp';
 import { readdir, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const SRC = path.resolve('src/img');
-const OUT = path.resolve('public/photos');
+const OUT = path.resolve('public/img/photos');
+const IMG = path.resolve('public/img');
 const MANIFEST = path.resolve('src/data/gallery.ts');
+
+// Fondos: horizontal para desktop, vertical para mobile.
+const BACKGROUNDS = [
+  { src: 'fondo.jpg', out: 'fondo-desktop.webp', size: { width: 1600 } },
+  { src: 'fondo-vertical.jpg', out: 'fondo-mobile.webp', size: { height: 1400 } },
+];
 
 const ALT = {
   'igexport-DeKGYHinI3F.jpg':
@@ -32,7 +39,17 @@ const ALT = {
 };
 
 await mkdir(OUT, { recursive: true });
-const files = (await readdir(SRC)).filter((f) => /\.(jpe?g|png)$/i.test(f) && f !== 'fondo.jpg');
+await mkdir(IMG, { recursive: true });
+
+for (const bg of BACKGROUNDS) {
+  await sharp(path.join(SRC, bg.src))
+    .rotate()
+    .resize({ ...bg.size, withoutEnlargement: true })
+    .webp({ quality: 80 })
+    .toFile(path.join(IMG, bg.out));
+}
+
+const files = (await readdir(SRC)).filter((f) => /\.(jpe?g|png)$/i.test(f) && !f.startsWith('fondo'));
 const entries = [];
 
 for (const file of files) {
@@ -40,18 +57,22 @@ for (const file of files) {
   const out = path.join(OUT, `${name}.webp`);
   await sharp(path.join(SRC, file))
     .rotate()
-    .resize({ width: 1600, height: 1600, fit: 'inside', withoutEnlargement: true })
+    .resize({ width: 576, height: 576, fit: 'inside', withoutEnlargement: true })
     .webp({ quality: 82 })
     .toFile(out);
   entries.push({
-    file: `/photos/${name}.webp`,
+    file: `/img/photos/${name}.webp`,
     alt: ALT[file] ?? `Foto de disfraces: ${name}`,
   });
 }
 
 entries.sort((a, b) => a.file.localeCompare(b.file));
+if (entries.length === 0) {
+  console.warn('No hay fotos en src/img; no se reescribe gallery.ts.');
+  process.exit(0);
+}
 const body = entries
   .map((e) => `  { file: '${e.file}', alt: '${e.alt.replace(/'/g, "\\'")}' },`)
   .join('\n');
 await writeFile(MANIFEST, `// Generado por scripts/prepare-photos.mjs - no editar a mano.\nexport const GALLERY: { file: string; alt: string }[] = [\n${body}\n];\n`, 'utf8');
-console.log(`${entries.length} fotos convertidas a WebP en public/photos/`);
+console.log(`${entries.length} fotos y ${BACKGROUNDS.length} fondos en public/img/`);

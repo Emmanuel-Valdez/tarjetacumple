@@ -1,4 +1,8 @@
-# Handoff — sesión 2026-10-21
+# Handoff — sesión 2026-10-21 (OBSOLETO)
+
+> Documento histórico. El change `front-polish` ya está implementado en el working tree
+> (incluye fondo único responsive, decoración parallax, carrusel de películas e imágenes
+> centralizadas en `public/img/`). Ver `README.md` y `DECISIONS.md`.
 
 ## Estado
 

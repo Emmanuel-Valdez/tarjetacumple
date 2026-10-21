@@ -1,20 +1,21 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { EVENT } from '../data/event';
-import { COSTUMES } from '../data/costumes';
 import { AWARDS, AWARDS_INTRO } from '../data/awards';
-import { GALLERY } from '../data/gallery';
+import { MOVIES } from '../data/movies';
 
-const awards = AWARDS.filter((a) => a.revealed);
+const mitad = Math.ceil(MOVIES.length / 2);
+const peliculasArriba = MOVIES.slice(0, mitad);
+const peliculasAbajo = MOVIES.slice(mitad).reverse();
 ---
 
-<Layout title={`${EVENT.name} cumple 30`}>
-  <!-- Hero: la imagen de fondo entra nitida y se difumina al hacer scroll -->
-  <div class="hero-bg" aria-hidden="true"></div>
+<Layout title="Juli: capitulo 30, la pelicula">
+  <!-- Fondo único: horizontal en desktop, vertical en mobile. Se difumina al scrollear. -->
+  <div class="fondo-cine" aria-hidden="true"></div>
 
-  <section class="relative flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
+  <section id="hero" class="relative flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
     <p class="text-neon-cyan neon-text text-sm tracking-widest uppercase">Estreno · {EVENT.date}</p>
-    <h1 class="text-5xl font-bold text-neon-magenta neon-text sm:text-7xl">{EVENT.name} cumple 30</h1>
+    <h1 class="text-4xl font-bold text-neon-magenta neon-text sm:text-6xl">Juli: tener 30, ser coqueta y prospera</h1>
     <p class="max-w-xl text-lg text-gray-200">
       Algunas historias merecen una secuela. La mía cumple 30 y la fiesta es de disfraces. ¿Te sumás al reparto?
     </p>
@@ -36,34 +37,50 @@ const awards = AWARDS.filter((a) => a.revealed);
     <a href={EVENT.mapsUrl} target="_blank" rel="noopener" class="mt-5 inline-block rounded border border-neon-cyan px-4 py-2 text-neon-cyan hover:bg-neon-cyan hover:text-black focus:outline-none focus:ring-2 focus:ring-neon-magenta">Ver en Google Maps</a>
   </section>
 
-  <!-- Banda con foto de fiesta difuminada -->
-  <div class="banda-fiesta" style={`--foto: url('${GALLERY[1].file}')`} role="img" aria-label="Foto de la fiesta de disfraces"></div>
-
   <!-- Dress code -->
   <section class="relative mx-auto max-w-2xl px-4 py-16 text-center">
     <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-4">Dress code</h2>
     <p class="text-gray-200">Disfraz obligatorio y temático. Si venís de civil, te toca ser extra de fondo.</p>
   </section>
 
-  <!-- Ideas de disfraz -->
-  <section class="relative mx-auto max-w-5xl px-4 py-16">
-    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-2 text-center">Ideas de disfraz</h2>
-    <p class="text-center text-sm text-gray-400 mb-8">22 referencias para inspirarte. Una de estas es la tuya.</p>
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {COSTUMES.map((c) => (
-        <article class="overflow-hidden rounded-lg border border-neon-cyan/25 bg-gray-950/60">
-          {c.photo && (
-            <img src={c.photo} alt="" loading="lazy" class="aspect-[4/3] w-full object-cover opacity-90" />
-          )}
-          <div class="p-4">
-            <h3 class="font-semibold text-neon-magenta flex items-center gap-2">
-              <span aria-hidden="true">{c.emoji}</span> {c.title}
-            </h3>
-            <p class="text-sm text-gray-200 mt-2"><span class="text-gray-500">El toque:</span> {c.item}</p>
-            <p class="text-sm text-gray-400 mt-2">{c.why}</p>
-          </div>
-        </article>
-      ))}
+  <!-- Solo adultos -->
+  <section class="relative mx-auto max-w-2xl px-4 py-16 text-center">
+    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-4">Solo adultos</h2>
+    <p class="text-xl text-gray-100 font-semibold">Público: +18</p>
+    <p class="text-gray-200 mt-3">
+      Si sos menor de edad, te toca ver la película desde la butaca de atrás: sin palomitas,
+      sin volumen y sin drama. Esta función es solo para adultos disfrazados.
+    </p>
+  </section>
+
+  <!-- Qué hay que traer -->
+  <section class="relative mx-auto max-w-2xl px-4 py-16">
+    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-4 text-center">Qué hay que traer</h2>
+    <ul class="mx-auto mt-4 max-w-xl space-y-4">
+      <li class="rounded border border-neon-cyan/25 bg-gray-950/60 p-4">
+        <h3 class="font-semibold text-neon-magenta flex items-center gap-2"><span aria-hidden="true">🎟️</span> Tu presencia</h3>
+        <p class="text-sm text-gray-200 mt-1">Lo único imprescindible. Con aparecer ya ganás el premio al mejor apoyo.</p>
+      </li>
+      <li class="rounded border border-neon-cyan/25 bg-gray-950/60 p-4">
+        <h3 class="font-semibold text-neon-magenta flex items-center gap-2"><span aria-hidden="true">🍸</span> Lo que vayas a tomar</h3>
+        <p class="text-sm text-gray-200 mt-1">Cada uno trae su propia bebida alcohólica: cerveza, vino, vodka, fernet, lo que tomes. Si no tomás, también vale tu presencia.</p>
+      </li>
+    </ul>
+  </section>
+
+  <!-- Carrusel de peliculas: reemplaza las ideas de disfraz -->
+  <section class="relative mx-auto max-w-6xl px-4 py-16">
+    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-2 text-center">Peliculas para inspirarte</h2>
+    <p class="text-center text-sm text-gray-400 mb-8">Algunas referencias para tu disfraz.</p>
+    <div class="space-y-4 overflow-hidden">
+      <div class="movie-row movie-row--left flex gap-3">
+        {peliculasArriba.map((m) => (<img src={m} alt="" loading="lazy" class="movie-card" />))}
+        {peliculasArriba.map((m) => (<img src={m} alt="" loading="lazy" class="movie-card" />))}
+      </div>
+      <div class="movie-row movie-row--right flex gap-3">
+        {peliculasAbajo.map((m) => (<img src={m} alt="" loading="lazy" class="movie-card" />))}
+        {peliculasAbajo.map((m) => (<img src={m} alt="" loading="lazy" class="movie-card" />))}
+      </div>
     </div>
   </section>
 
@@ -71,16 +88,14 @@ const awards = AWARDS.filter((a) => a.revealed);
   <section id="premios" class="relative mx-auto max-w-4xl px-4 py-16">
     <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-4 text-center">Los Premios de la Noche</h2>
     <p class="text-center text-gray-200 max-w-2xl mx-auto">{AWARDS_INTRO}</p>
-    {awards.length > 0 && (
-      <ul class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {awards.map((a) => (
-          <li class="rounded border border-cinema-gold/40 bg-gray-950/60 p-3 text-sm">
-            <span aria-hidden="true">{a.emoji}</span> <span class="font-semibold text-cinema-gold">{a.title}</span>
-          </li>
-        ))}
-      </ul>
-    )}
-    <p class="text-center text-sm text-gray-500 mt-6">Las categorías se anuncian en el momento. Venite con el disfraz resuelto.</p>
+    <ul class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+      {AWARDS.map((a) => (
+        <li class="rounded border border-cinema-gold/40 bg-gray-950/60 p-3 text-sm">
+          <span aria-hidden="true">{a.emoji}</span> <span class="font-semibold text-cinema-gold">{a.title}</span>
+          <span class="block text-gray-400 mt-1">{a.teaser}</span>
+        </li>
+      ))}
+    </ul>
   </section>
 
   <!-- Playlist -->
@@ -131,6 +146,33 @@ const awards = AWARDS.filter((a) => a.revealed);
       <p id="rsvp-status" class="text-sm" role="status" aria-live="polite"></p>
     </form>
   </dialog>
+
+  <!-- Decoración fija: pocos globos y confetis, se mueven solo con el scroll. -->
+  <div class="decor" id="decor" aria-hidden="true">
+    <span class="decor-balloon" style="left:5%;top:84%;font-size:2.75rem;--v:0.09">🎈</span>
+    <span class="decor-balloon" style="left:88%;top:70%;font-size:2rem;--v:0.05">🎈</span>
+    <span class="decor-balloon" style="left:72%;top:92%;font-size:3rem;--v:0.12">🎈</span>
+    <span class="decor-balloon" style="left:22%;top:60%;font-size:1.6rem;--v:0.03">🎈</span>
+    <span class="decor-confetti" style="left:12%;top:35%;--c:#ff00ff;--r:18deg;--v:0.07"></span>
+    <span class="decor-confetti" style="left:35%;top:70%;--c:#00f0ff;--r:-30deg;--v:0.04"></span>
+    <span class="decor-confetti" style="left:58%;top:28%;--c:#39ff14;--r:45deg;--v:0.10"></span>
+    <span class="decor-confetti" style="left:79%;top:48%;--c:#d4af37;--r:-12deg;--v:0.06"></span>
+    <span class="decor-confetti" style="left:93%;top:22%;--c:#ff6b6b;--r:60deg;--v:0.08"></span>
+    <span class="decor-confetti" style="left:47%;top:88%;--c:#ffffff;--r:10deg;--v:0.05"></span>
+  </div>
+
+  <!-- Música de fondo -->
+  <button
+    id="music-toggle"
+    type="button"
+    class="fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-full border border-neon-cyan/50 bg-gray-950/80 px-4 py-2 text-sm text-neon-cyan backdrop-blur focus:outline-none focus:ring-2 focus:ring-neon-cyan focus:ring-offset-2 focus:ring-offset-cinema-black"
+    aria-pressed="true"
+    aria-label="Música de fondo"
+  >
+    <span id="music-icon" aria-hidden="true">🎵</span>
+    <span id="music-hint">Tocá para escuchar</span>
+  </button>
+  <div id="music-player" class="music-player" aria-hidden="true"></div>
 
   <script>
     const cd = document.getElementById('countdown')!;
@@ -285,5 +327,100 @@ const awards = AWARDS.filter((a) => a.revealed);
     });
 
     loadGallery();
+  </script>
+
+  <script>
+    // Parallax decorativo: globos y confetis suben solo al scrollear.
+    const decor = document.getElementById('decor');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (decor && !reduceMotion) {
+      let ticking = false;
+      const update = () => { decor.style.setProperty('--scroll', String(window.scrollY)); ticking = false; };
+      window.addEventListener('scroll', () => {
+        if (!ticking) { ticking = true; requestAnimationFrame(update); }
+      }, { passive: true });
+      update();
+    }
+  </script>
+
+  <script>
+    // Música de fondo: YouTube IFrame API con autoplay muteado + control on/off.
+    const btn = document.getElementById('music-toggle')!;
+    const icon = document.getElementById('music-icon')!;
+    const hint = document.getElementById('music-hint')!;
+    const YT_ID = 'PIb6AZdTr-A';
+
+    let player: any = null;
+    let playing = true;
+    let unmuted = false;
+    let available = true;
+
+    function render() {
+      if (!available) {
+        icon.textContent = '🚫';
+        hint.textContent = 'No disponible';
+        btn.setAttribute('aria-pressed', 'false');
+        return;
+      }
+      icon.textContent = playing ? '🎵' : '🔇';
+      hint.textContent = unmuted ? '' : 'Tocá para escuchar';
+      btn.setAttribute('aria-pressed', String(playing));
+    }
+
+    function loadApi() {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(tag);
+    }
+
+    (window as any).onYouTubeIframeAPIReady = () => {
+      try {
+        player = new (window as any).YT.Player('music-player', {
+          width: '1',
+          height: '1',
+          videoId: YT_ID,
+          playerVars: { autoplay: 1, mute: 1, loop: 1, playlist: YT_ID, controls: 0, rel: 0 },
+          events: { onReady: (e: any) => { try { e.target.playVideo(); } catch {} } },
+        });
+      } catch {
+        available = false;
+        render();
+      }
+    };
+
+    loadApi();
+    setTimeout(() => { if (!player) { available = false; render(); } }, 10000);
+
+    function unmuteOnce() {
+      if (unmuted || !player) return;
+      try { player.unMute(); unmuted = true; } catch {}
+      render();
+      window.removeEventListener('pointerdown', unmuteOnce);
+      window.removeEventListener('keydown', unmuteOnce);
+    }
+    window.addEventListener('pointerdown', unmuteOnce);
+    window.addEventListener('keydown', unmuteOnce);
+
+    btn.addEventListener('click', () => {
+      if (!available || !player) return;
+      try {
+        if (playing) player.pauseVideo();
+        else { player.playVideo(); player.unMute(); unmuted = true; }
+        playing = !playing;
+      } catch {}
+      render();
+    });
+
+    render();
+
+    // Fondo: se difumina apenas el hero sale del viewport.
+    const hero = document.getElementById('hero');
+    const fondo = document.querySelector('.fondo-cine');
+    if (hero && fondo) {
+      new IntersectionObserver(
+        ([entry]) => fondo.classList.toggle('difuminado', !entry.isIntersecting),
+        { threshold: 0 },
+      ).observe(hero);
+    }
   </script>
 </Layout>

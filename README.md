@@ -1,7 +1,7 @@
 # Tarjeta Cumple — Juli 30
 
 Invitación web para el cumpleaños 30 de **Julieta "Juli" Rosales**.
-**10 de enero de 2027** · Camping Centro de Empleados de Comercio, Mathus Hoyos 2525, El Bermejo, Guaymallén (Mendoza).
+**9 de enero de 2027, 22:00 h** · Camping Centro de Empleados de Comercio, Mathus Hoyos 2525, El Bermejo, Guaymallén (Mendoza).
 
 Tema: *fiesta en el cine* — disfraces de películas/series, premios "Oscar" de la noche, banda sonora entre todos.
 
@@ -24,7 +24,8 @@ npm run check            # astro check (tipos)
 
 npm run db:generate      # generar migración drizzle
 npm run db:migrate       # aplicar migraciones
-npm run photos:prepare   # src/img/*.jpg -> public/photos/*.webp + src/data/gallery.ts
+npm run photos:prepare   # src/img/*.jpg -> public/img/photos/*.webp + src/data/gallery.ts
+npm run movies:prepare   # src/img/movies/* -> public/img/movies/*.webp + src/data/movies.ts
 npm run db:clean         # borrar datos de prueba (rsvps, likes, tracks, fotos subidas)
 ```
 
@@ -41,7 +42,7 @@ npx astro dev stop
 
 ```
 src/
-  data/          # contenido editable: event.ts, costumes.ts, awards.ts, gallery.ts (generado)
+  data/          # contenido editable: event.ts, awards.ts, gallery.ts y movies.ts (generados)
   db/            # schema.ts (drizzle) + index.ts (conexión, migración y seed)
   layouts/       # Layout.astro
   lib/           # auth.ts (sesiones), visitor.ts (cookie anonima), images.ts (sharp), env.ts
@@ -50,8 +51,14 @@ src/
     admin/       # panel (login + RSvps + canciones + fotos)
     api/         # endpoints: rsvp, likes, tracks, photos, admin/*
 public/
-  fondo.webp     # fondo del hero
-  photos/        # webp generados (versionado en git)
+  img/           # TODAS las imagenes servidas (versionado en git)
+    fondo-desktop.webp   # fondo horizontal (landscape)
+    fondo-mobile.webp    # fondo vertical (portrait)
+    favicon.svg          # icono zombie de MJ
+    apple-touch-icon.png # 180x180
+    icon-512.png         # 512x512
+    photos/              # galeria y disfraces (576px)
+    movies/              # carrusel de peliculas (360x480)
 data/            # db.sqlite + uploads (NO versionado)
 ```
 
@@ -60,11 +67,11 @@ data/            # db.sqlite + uploads (NO versionado)
 | Archivo | Qué define |
 |---|---|
 | `src/data/event.ts` | fecha, hora, lugar, dirección, link de Maps, playlist de Spotify |
-| `src/data/costumes.ts` | las 22 referencias de disfraz (item + por qué funciona + foto) |
-| `src/data/awards.ts` | premios "Oscar"; `revealed: false` = solo teaser |
+| `src/data/awards.ts` | premios "Oscar"; las categorías se muestran siempre visibles |
 | `src/data/gallery.ts` | **generado** por `npm run photos:prepare` — no editar a mano |
+| `src/data/movies.ts` | **generado** por `npm run movies:prepare` — carrusel de películas |
 
-Fotos nuevas: dejarlas en `src/img/` y correr `npm run photos:prepare`.
+Fotos nuevas: dejarlas en `src/img/` y correr `npm run photos:prepare`. Imágenes del carrusel: en `src/img/movies/` y `npm run movies:prepare`.
 
 ## Variables de entorno
 
@@ -99,7 +106,8 @@ Copia `.env.example` a `.env` y cambiá las claves.
 
 ## Imágenes
 
-- Las fotos del repo (`src/img/`) se convierten a **WebP** (máx. 1600 px, q82) en `public/photos/` y se registran solas en la DB al arrancar (seed idempotente en `src/db/index.ts`).
+- Las fotos del repo (`src/img/`) se convierten a **WebP** (`public/img/photos/`, máx. 576 px, q82) y los fondos a `public/img/fondo-desktop.webp` (1600 px) y `fondo-mobile.webp` (1200 px). Se registran solas en la DB al arrancar (seed idempotente en `src/db/index.ts`).
+- El carrusel de películas usa `src/img/movies/` → `public/img/movies/` (360×480, q75) vía `npm run movies:prepare`.
 - Las subidas desde `/admin` pasan por **sharp**: se reescalan a 1600 px y se guardan como WebP en el volumen `UPLOADS_PATH` (tope 12 MB de entrada). Se pueden subir todas las que quieras, no hay límite de cantidad.
 - La galería es un carrusel horizontal con scroll infinito (3 copias de la pista, sin botones) y like por cookie anónima.
 
@@ -108,7 +116,7 @@ Copia `.env.example` a `.env` y cambiá las claves.
 El build ocurre **en el VPS** (el paquete de Docker no se publica).
 
 1. En el VPS: `git clone <repo> /opt/juli30/app`, crear `/opt/juli30/app/.env` con las claves reales, y `docker compose up -d` una vez para crear el volumen.
-2. `git push main` dispara `.github/workflows/deploy.yml` → por Tailscale SSH hace `git pull && docker compose build && docker compose up -d` en `/opt/juli30/app`.
+2. `git push master` dispara `.github/workflows/deploy.yml` → por Tailscale SSH hace `git pull && docker compose build && docker compose up -d` en `/opt/juli30/app`.
 3. Nginx (ver `nginx.conf.example`) hace de reverse proxy TLS → `127.0.0.1:3000`. Cloudflare en modo *Full (strict)*.
 4. Secretos de GitHub: `VPS_USER`, `VPS_HOST`, `TS_OAUTH_CLIENT_ID`, `TS_OAUTH_SECRET`.
 

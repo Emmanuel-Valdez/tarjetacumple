@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   workflow_dispatch:
 
 jobs:
@@ -17,4 +17,4 @@ jobs:
       - name: Build y deploy en el servidor
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-            "cd /opt/juli30/app && git pull --ff-only origin main && docker compose build && docker compose up -d && docker compose logs --tail=30 app"
+            "cd /opt/juli30/app && git pull --ff-only origin master && docker compose build && docker compose up -d && docker compose logs --tail=30 app"

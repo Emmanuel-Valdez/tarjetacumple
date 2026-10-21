@@ -16,19 +16,25 @@ The system SHALL display a hero section with the birthday person's name, the tag
 - **THEN** it counts down to the event date and time declared in the event data module
 
 ### Requirement: Hero background
-The system SHALL show the background image sharp and fully visible when the page loads, and SHALL fade in a second, blurred party background as the visitor scrolls down.
+The system SHALL show a single background image, sharp on entry, and SHALL blur it once the visitor scrolls past the hero. The image SHALL be horizontal on landscape viewports and vertical on portrait viewports.
 
 #### Scenario: Background sharp on entry
 - **WHEN** the visitor lands on the page
-- **THEN** the background image is shown sharp, not blurred, and entirely within the viewport
+- **THEN** the background image is shown sharp, not blurred
 
 #### Scenario: Blurred background on scroll
 - **WHEN** the visitor scrolls down past the hero
-- **THEN** a blurred party photo fades in as the background and the sharp image stops being the dominant layer
+- **THEN** the background image blurs and darkens
+
+#### Scenario: Responsive background
+- **WHEN** the viewport is portrait
+- **THEN** the vertical background is used
+- **WHEN** the viewport is landscape
+- **THEN** the horizontal background is used
 
 #### Scenario: Reduced motion respected
 - **WHEN** the visitor prefers reduced motion
-- **THEN** the background layers switch without a transition
+- **THEN** the background switches between sharp and blurred without a transition
 
 ### Requirement: Awards teaser
 The system SHALL list the award categories visibly on the page, without instructions addressed to the organizer.
@@ -51,21 +57,6 @@ The system SHALL read the date, time, venue, address and map link from a single 
 #### Scenario: Real schedule is displayed
 - **WHEN** a visitor views the location section
 - **THEN** it shows Saturday January 9th 2027 at 22:00, Argentina time
-
-### Requirement: Costume ideas carousel
-The system SHALL present 18 costume references from iconic movies/series in a carousel, of which 8 include a photo.
-
-#### Scenario: Carousel navigable
-- **WHEN** a visitor interacts with the carousel
-- **THEN** they can move between costume cards
-
-#### Scenario: Each card shows characteristic item
-- **WHEN** a costume card is displayed
-- **THEN** it shows the title, a caricatured characteristic item and why it works
-
-#### Scenario: Reference list is curated
-- **WHEN** the costume list is displayed
-- **THEN** it contains Chavo del 8 and ¿...y dónde están las rubias? and does not contain Clueless, El Quinto Elemento, Midsommar, Legalmente Rubia, El Gran Lebowski or La Casa de Papel
 
 ## ADDED Requirements
 
@@ -92,11 +83,11 @@ The system SHALL display a section presenting the guests' contribution as their 
 - **THEN** it states that guests bring their own alcoholic drinks
 
 ### Requirement: Page title and favicon
-The system SHALL use "Juli: De repente 30" as the browser tab title and a Michael Jackson zombie themed icon as the favicon.
+The system SHALL use "Juli: capitulo 30, la pelicula" as the browser tab title and a Michael Jackson zombie themed icon as the favicon.
 
 #### Scenario: Tab title
 - **WHEN** a visitor looks at the browser tab
-- **THEN** it reads "Juli: De repente 30"
+- **THEN** it reads "Juli: capitulo 30, la pelicula"
 
 #### Scenario: Favicon present
 - **WHEN** a visitor loads the page
@@ -108,3 +99,40 @@ The system SHALL NOT produce a horizontal scrollbar at any viewport width.
 #### Scenario: No lateral scroll on mobile
 - **WHEN** a visitor views the page on a 390px wide screen
 - **THEN** the document width equals the viewport width and no horizontal scrollbar appears
+
+### Requirement: Movie inspiration carousel
+The system SHALL replace the costume ideas grid with two auto-scrolling rows of movie/series images. Each row SHALL show a different half of the image set, loop seamlessly, and move slowly enough to read.
+
+#### Scenario: Rows do not repeat each other
+- **WHEN** the carousel is displayed
+- **THEN** the top row shows the first half of the images and the bottom row the second half
+
+#### Scenario: Carousel loops
+- **WHEN** a row finishes its scroll cycle
+- **THEN** it restarts without a visible jump
+
+#### Scenario: Reduced motion respected
+- **WHEN** the visitor prefers reduced motion
+- **THEN** the rows stay static
+
+### Requirement: Optimized image assets
+The system SHALL serve every image from `public/img/`, sized for its rendered slot.
+
+#### Scenario: Images are tracked and sized
+- **WHEN** the site is built
+- **THEN** backgrounds, icons, gallery photos and movie cards come from `public/img/` and no image is served above its display resolution
+
+### Requirement: Parallax decoration
+The system SHALL show a few static balloons and confetti that move upward only as the visitor scrolls, at different speeds, without any autonomous animation.
+
+#### Scenario: No autonomous motion
+- **WHEN** the page is idle
+- **THEN** the decoration does not move
+
+#### Scenario: Parallax on scroll
+- **WHEN** the visitor scrolls down
+- **THEN** the decoration moves up at a fraction of the scroll speed, with layers at different speeds to suggest depth
+
+#### Scenario: Reduced motion respected
+- **WHEN** the visitor prefers reduced motion
+- **THEN** the decoration stays static

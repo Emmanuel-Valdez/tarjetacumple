@@ -18,7 +18,7 @@ Antes de tocar la UI, corré `npm run check` (types) y `npm run build` (SSR). El
 ## Dónde tocar qué
 
 - **Contenido** (fecha, lugar, disfraces, premios) → `src/data/*.ts`. No hardcodear en los `.astro`.
-- `src/data/gallery.ts` es **generado**: se regenera con `npm run photos:prepare` (lee `src/img/`, escribe `public/photos/*.webp`). No editar a mano.
+- `src/data/gallery.ts` es **generado**: se regenera con `npm run photos:prepare` (lee `src/img/`, escribe `public/img/photos/*.webp`). No editar a mano.
 - Fotos nuevas → dejar en `src/img/` y correr `npm run photos:prepare`.
 - **APIs**: `src/pages/api/`. Mutaciones de admin siempre valida `verifySession` (ver `src/lib/auth.ts`).
 - **Fotos subidas**: se reescalan a WebP con sharp (`src/lib/images.ts`), se guardan en `UPLOADS_PATH` y se sirven por `/api/photos/[id]/file`. Las de `public/` se sirven estáticas y se registran en la DB con `filename` empiezan en `/`.

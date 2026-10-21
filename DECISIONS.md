@@ -2,7 +2,7 @@
 
 ## Proyecto
 - Invitación web para cumpleaños 30 de **Julieta "Juli" Rosales**.
-- Fecha del evento: **10 de enero de 2027** (DD/MM).
+- Fecha del evento: **sábado 9 de enero de 2027, 22:00 h** (ART, UTC-3 fijo, sin DST).
 - Subdominio: `juli30.evaldez.ar`.
 - Temática: fiesta de disfraces con referencias a películas/series icónicas.
 - Estilo visual: negro + dorado + rojo cortina, tira de film, claqueta, "próximo estreno".
@@ -126,12 +126,12 @@ Referencias (20):
 ## Ronda 3 — decisiones (2026-10)
 
 - **Contenido en `src/data/`**: `event.ts` (fecha/lugar/Maps/Spotify), `costumes.ts` (22 disfraces con item + por qué + foto), `awards.ts` (premios con flag `revealed`), `gallery.ts` (generado). No se hardcodea copy en los `.astro`.
-- **Fotos del repo**: `src/img/*.jpg` → `public/photos/*.webp` con `npm run photos:prepare` (sharp, máx 1600px, q82). Se registran solas en la DB al arrancar (seed idempotente). Las fotos en `public/` se sirven estáticas; las subidas por admin viven en el volumen.
+- **Fotos del repo**: `src/img/*.jpg` → `public/img/photos/*.webp` con `npm run photos:prepare` (sharp, máx 576px, q82). Los fondos salen del mismo script a `public/img/fondo-desktop.webp` y `fondo-mobile.webp`. Se registran solas en la DB al arrancar (seed idempotente). Las fotos en `public/` se sirven estáticas; las subidas por admin viven en el volumen.
 - **Subida de imágenes**: sharp reescala a WebP (1600px, q82) en el server → ~100 KB por foto en vez de varios MB. Tope de entrada 12 MB. Sin límite de cantidad.
 - **Sharp** (`sharp@0.35.5`) como dependencia directa: es el análogo de SkiaSharp que usa VaultShop, pero native de Node.
 - **Galería**: carrusel horizontal minimalista, scroll infinito (3 copias de la pista, wrap en scroll), sin botones, arrastre con mouse — en el estilo de fddtour.com.ar.
-- **Hero**: `fondo.webp` de fondo fijo, entra nítido y se difumina (blur 9px + brightness 0.7) a los 2.4 s. `prefers-reduced-motion` lo muestra ya difuminado.
-- **Premios Oscar**: sección "Los Premios de la Noche" con copy que anuncia el concurso pero **no revela las categorías** (`revealed: false` → "Se anuncia en la noche"). Para destaparlas, cambiar el flag en `src/data/awards.ts`.
+- **Hero**: `fondo.webp` de fondo fijo, entra nítido y se difumina (blur 9px + brightness 0.7) a los 2.4 s. `prefers-reduced-motion` lo muestra ya difuminado. *(Superado en Ronda 5 por el fondo único que se difumina al scrollear.)*
+- **Premios Oscar**: sección "Los Premios de la Noche". *(En Ronda 4 pasan a categorías siempre visibles.)*
 - **Ubicación real**: Camping Centro de Empleados de Comercio, Mathus Hoyos 2525, El Bermejo, Guaymallén. Link de Maps con la place id.
 - **Contador de confirmados**: cuenta *personas* (1 + acompañantes), no filas.
 - **Deploy**: el build ocurre **en el VPS** (`git pull && docker compose build && up -d` por Tailscale SSH). No se publica imagen en GHCR. Compose usa `env_file: .env` y volumen `juli30_data` para db + uploads.
@@ -159,4 +159,27 @@ Referencias (20):
 - Auth de invitados (solo admin).
 - Personalización de fotos por invitados.
 - Notificaciones email (posible después).
+
+## Ronda 4 — front-polish (change `front-polish`)
+
+- **Fecha real**: sábado **9 de enero de 2027, 22:00 h** (ART = UTC-3 fijo; Argentina no usa DST). `event.ts` centraliza `date`, `time` y `dateISO` (`2027-01-09T22:00:00-03:00`); el countdown lee `EVENT.dateISO`.
+- **Scroll lateral**: la causa era `.banda-fiesta` con `transform: scale(1.05)` (el transform suma al overflow visual). Se reemplaza por `background-size: 108%` y se agrega `body { overflow-x: clip }` como red de seguridad (`clip`, no `hidden`, para no romper `position: sticky` ni recortar focus rings).
+- **Fondo en dos capas**: `.fondo-cine` muestra `fondo.webp` **entero y nítido** (`contain` + letterbox del color de fondo) y `.fondo-fiesta` (foto de la fiesta con `blur(18px)`) entra al scrollear vía `IntersectionObserver` sobre el hero. Se elimina el `@keyframes hero-blur`. `prefers-reduced-motion` quita la transición. *(Superado en Ronda 5: un solo fondo, horizontal en desktop y vertical en mobile, que se difumina al scrollear.)*
+- **Identidad**: `<h1>` = "Juli: tener 30, ser coqueta y prospera"; `<title>` = "Juli: capitulo 30, la pelicula". Favicon zombie de MJ dibujado a mano en `public/img/favicon.svg`, rasterizado con sharp a `apple-touch-icon.png` (180) e `icon-512.png` (512). El `.ico` legacy se descarta (sharp no emite `.ico`).
+- **Música de fondo**: YouTube IFrame API con el video oficial de *Girls Just Want to Have Fun* (`PIb6AZdTr-A`), autoplay **muteado** (política de los navegadores), unmute al primer `pointerdown`/`keydown` y botón visible 🎵/🔇 con `aria-pressed`. Sin dependencias npm nuevas.
+- **Premios visibles**: se quita el flag `revealed` y el filtro; las 6 categorías se muestran siempre. Se reescribe `AWARDS_INTRO` sin la instrucción al organizador. El toggle desde `/admin` queda descartado (nota en `tasks.md` §7).
+- **Disfraces**: se quitan Clueless, El Quinto Elemento, Midsommar, Legalmente Rubia, El Gran Lebowski y La Casa de Papel; se suman Chavo del 8 y ¿...y dónde están las rubias? (sin foto). Quedan 18 referencias, 8 con foto.
+- **Secciones nuevas**: "Solo adultos" (aviso +18 en tono de ficha de cine) y "Qué hay que traer" (tu presencia + tu bebida alcohólica).
+- **`.claude/`**: los symlinks a `.agents/skills/` eran redundantes (los skills viven en `.agents/skills/` y `.opencode/skills/`). No se restaura; `.claude/` queda en `.gitignore`.
+
+## Ronda 5 — imágenes, fondo único y carrusel
+
+- **Carpeta única de imágenes**: todo lo servido vive en `public/img/` (versionado): `fondo-desktop.webp`, `fondo-mobile.webp`, `favicon.svg`, `apple-touch-icon.png`, `icon-512.png`, `photos/` y `movies/`. Las fuentes siguen en `src/img/` (gitignored).
+- **Optimización por uso**: fotos de galería/disfraces 576 px q82; carrusel 360×480 q75 (cards de 120×160 a 3x); fondos 1376×768 y 896×1200 q80.
+- **Fondo único**: `.fondo-cine` usa `fondo-mobile.webp` en portrait y `fondo-desktop.webp` en landscape (`@media (orientation: landscape)`). Se elimina `.fondo-fiesta` y la foto de fiesta.
+- **Blur al scrollear**: un `IntersectionObserver` sobre el hero agrega `.difuminado` (`blur(9px) brightness(0.7)`) al fondo cuando el hero sale del viewport. `prefers-reduced-motion` quita la transición.
+- **Carrusel de películas**: 25 imágenes en dos filas con loop CSS; el desplazamiento compensa el `gap` (`calc(-50% - 0.375rem)`) para que no salte.
+- **Ideas de disfraz**: se elimina la sección completa (grid + subtítulo) y `src/data/costumes.ts`. La reemplaza el carrusel: cada fila muestra la mitad de las imágenes (arriba la primera, abajo la segunda) y la animación baja a 55 s para que no se trabe.
+- **Decoración parallax**: se descarta el confeti animado. En su lugar hay 4 globos y 6 confetis fijos que suben solo al scrollear, a velocidades distintas (efecto de profundidad) y sin bucle de animación. Con `prefers-reduced-motion` quedan estáticos.
+- **Título de pestaña**: "Juli: capitulo 30, la pelicula" (reemplaza a "Juli: De repente 30").
 

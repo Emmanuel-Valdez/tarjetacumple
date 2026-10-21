@@ -4,46 +4,38 @@ export type Award = {
   emoji: string;
 };
 
-// revealed: false muestra solo el teaser. La organizadora lo cambia a true
-// cuando quiera destapar las categorias en la web.
-export const AWARDS: (Award & { revealed: boolean })[] = [
+export const AWARDS: Award[] = [
   {
     title: 'Mejor Disfraz Masculino',
-    teaser: 'Se anuncia en la noche',
+    teaser: 'El que mejor resuelve su personaje',
     emoji: '🏆',
-    revealed: false,
   },
   {
     title: 'Mejor Disfraz Femenino',
-    teaser: 'Se anuncia en la noche',
+    teaser: 'El look más icónico de la noche',
     emoji: '🌟',
-    revealed: false,
   },
   {
     title: 'Mejor Disfraz de Pareja o Grupo',
-    teaser: 'Se anuncia en la noche',
+    teaser: 'Los que se coordinan de punta a punta',
     emoji: '👯',
-    revealed: false,
   },
   {
     title: 'Premio a la Nostalgia Milenial',
-    teaser: 'Se anuncia en la noche',
+    teaser: 'El que te teletransporta a los 2000',
     emoji: '📼',
-    revealed: false,
   },
   {
     title: 'Premio de la Casa de los Espellos',
-    teaser: 'Se anuncia en la noche',
+    teaser: 'El mejor reflejo de la pista',
     emoji: '🪞',
-    revealed: false,
   },
   {
     title: 'Premio al Esfuerzo Heroico',
-    teaser: 'Se anuncia en la noche',
+    teaser: 'Hecho a mano, con dedicación y maquillaje',
     emoji: '🎖️',
-    revealed: false,
   },
 ];
 
 export const AWARDS_INTRO =
-  'La gente se esfuerza mucho con los disfraces temáticos. Organizá un concurso a mitad de la noche y entregá estatuillas similares a los Premios Oscar. Las categorías se anuncian en el momento, así que venite con el disfraz resuelto.';
+  'La gente se esfuerza muchísimo con los disfraces temáticos. Los premios se entregan en la noche, así que venite con el disfraz resuelto y a punto.';

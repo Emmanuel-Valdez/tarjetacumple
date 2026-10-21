@@ -20,7 +20,7 @@ export { sqlite };
 
 migrate(db, { migrationsFolder: join(process.cwd(), 'drizzle') });
 
-// Seed idempotente: registra las fotos estaticas de public/photos (servidas por Astro).
+// Seed idempotente: registra las fotos estaticas de public/img/photos (servidas por Astro).
 // Solo corre una vez por archivo nuevo; los placeholders viejos se limpian.
 try {
   db.delete(schema.photos).where(eq(schema.photos.filename, 'placeholder')).run();

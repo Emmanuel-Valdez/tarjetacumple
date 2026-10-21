@@ -14,6 +14,7 @@
     background-color: var(--color-cinema-black);
     color: #e5e5e5;
     font-family: system-ui, -apple-system, sans-serif;
+    overflow-x: clip;
   }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -24,33 +25,83 @@
   text-shadow: 0 0 6px currentColor, 0 0 12px currentColor;
 }
 
-/* Fondo del cine: entra nitido al abrir y se difumina para que se lea el texto. */
-.hero-bg {
+/* Fondo único: vertical en mobile, horizontal en desktop. Se difumina al scrollear. */
+.fondo-cine {
+  position: fixed;
+  inset: -24px;
+  z-index: -2;
+  background-image: url('/img/fondo-mobile.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: var(--color-cinema-black);
+  filter: blur(0) brightness(1);
+  transition: filter 0.6s ease;
+}
+@media (orientation: landscape) {
+  .fondo-cine { background-image: url('/img/fondo-desktop.webp'); }
+}
+.fondo-cine.difuminado { filter: blur(9px) brightness(0.7); }
+@media (prefers-reduced-motion: reduce) {
+  .fondo-cine { transition: none; }
+}
+/* Reproductor de YouTube oculto: no ocupa layout. */
+.music-player {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Carrusel de peliculas: filas automaticas en sentidos opuestos. */
+.movie-card {
+  flex: none;
+  width: 120px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0, 240, 255, 0.25);
+}
+.movie-row {
+  width: max-content;
+  will-change: transform;
+  animation: movie-scroll-left 55s linear infinite;
+}
+.movie-row--right { animation-name: movie-scroll-right; }
+@keyframes movie-scroll-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-50% - 0.375rem)); }
+}
+@keyframes movie-scroll-right {
+  from { transform: translateX(calc(-50% - 0.375rem)); }
+  to { transform: translateX(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .movie-row { animation: none; }
+}
+
+/* Decoración parallax: pocos globos y confetis que solo se mueven con el scroll. */
+.decor {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background-image: url('/fondo.webp');
-  background-size: cover;
-  background-position: center;
-  filter: blur(0px) brightness(1);
-  animation: hero-blur 2.4s ease-out forwards;
-  transform: translateZ(0);
+  pointer-events: none;
+  overflow: hidden;
 }
-@keyframes hero-blur {
-  to { filter: blur(9px) brightness(0.7); }
+.decor > * {
+  position: absolute;
+  will-change: transform;
+  transform: translate3d(0, calc(var(--scroll, 0) * -1px * var(--v, 0.05)), 0);
 }
-@media (prefers-reduced-motion: reduce) {
-  .hero-bg { animation: none; filter: blur(9px) brightness(0.7); }
-}
-
-/* Banda con foto de fiesta difuminada entre secciones. */
-.banda-fiesta {
-  height: 14rem;
-  background-image: var(--foto);
-  background-size: cover;
-  background-position: center;
-  filter: blur(6px) saturate(1.2);
-  transform: scale(1.05);
+.decor-balloon { opacity: 0.75; }
+.decor-confetti {
+  width: 8px;
+  height: 12px;
+  background: var(--c, #fff);
+  border-radius: 1px;
+  opacity: 0.8;
+  transform: translate3d(0, calc(var(--scroll, 0) * -1px * var(--v, 0.05)), 0) rotate(var(--r, 0deg));
 }
 
 /* Galeria: scroll horizontal real, sin botones, con arrastre con mouse. */
@@ -80,7 +131,4 @@
   overflow: hidden;
   scroll-snap-align: center;
   background: #15151c;
-}
-@media (prefers-reduced-motion: reduce) {
-  .hero-bg { animation: none; }
 }
