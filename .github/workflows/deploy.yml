@@ -29,4 +29,4 @@ jobs:
             docker compose build
             docker compose up -d
             docker compose ps
-            curl -I http://127.0.0.1:3000/
+            curl -fsSI --retry 10 --retry-all-errors --retry-delay 2 http://127.0.0.1:3000/
