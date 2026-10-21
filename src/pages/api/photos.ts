@@ -19,7 +19,8 @@ export const GET: APIRoute = async ({ request }) => {
   const likedSet = new Set(liked.map((l) => l.photoId));
   const data = rows.map((p) => ({
     id: p.id,
-    url: `/api/photos/${p.id}/file`,
+    // Las fotos estaticas viven en public/ y las subidas en el volumen de uploads.
+    url: p.filename.startsWith('/') ? p.filename : `/api/photos/${p.id}/file`,
     alt: p.alt,
     likes: countMap.get(p.id) ?? 0,
     liked: likedSet.has(p.id),

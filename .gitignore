@@ -13,7 +13,8 @@ out/
 .env.*
 !.env.example
 
-# Database
+# Database (solo la raiz del proyecto; src/data/ SI se versiona)
+/data/
 *.db
 *.db-journal
 *.db-wal
@@ -22,7 +23,9 @@ out/
 *.sqlite-journal
 *.sqlite-wal
 *.sqlite-shm
-data/
+
+# Fotos fuente (los .webp optimizados de public/photos/ SI se versionan)
+src/img/
 
 # .NET
 bin/
@@ -39,6 +42,12 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# Playwright MCP
+.playwright-mcp/
+
+# Claude Code (no se usa; los skills viven en .agents/skills/ y .opencode/skills/)
+.claude/
 
 # OpenSpec / tooling (keep openspec/, ignore caches)
 .opencode/node_modules/

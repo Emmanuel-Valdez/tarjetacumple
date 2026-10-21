@@ -4,7 +4,9 @@ import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import * as schema from './schema';
 import { mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
+import { GALLERY } from '../data/gallery';
+import '../lib/env';
 
 const dbPath = process.env.DATABASE_PATH || './data/db.sqlite';
 mkdirSync(dirname(dbPath), { recursive: true });
@@ -18,12 +20,16 @@ export { sqlite };
 
 migrate(db, { migrationsFolder: join(process.cwd(), 'drizzle') });
 
-// seed placeholders once
+// Seed idempotente: registra las fotos estaticas de public/photos (servidas por Astro).
+// Solo corre una vez por archivo nuevo; los placeholders viejos se limpian.
 try {
-  const count = db.select({ c: sql<number>`count(*)` }).from(schema.photos).all()[0]?.c ?? 0;
-  if (count === 0) {
-    for (let i = 0; i < 6; i++) {
-      db.insert(schema.photos).values({ filename: 'placeholder', alt: `Foto ${i + 1}`, sortOrder: i }).run();
+  db.delete(schema.photos).where(eq(schema.photos.filename, 'placeholder')).run();
+  const existing = new Set(
+    db.select({ f: schema.photos.filename }).from(schema.photos).all().map((r) => r.f),
+  );
+  GALLERY.forEach((g, i) => {
+    if (!existing.has(g.file)) {
+      db.insert(schema.photos).values({ filename: g.file, alt: g.alt, sortOrder: i }).run();
     }
-  }
+  });
 } catch {}
