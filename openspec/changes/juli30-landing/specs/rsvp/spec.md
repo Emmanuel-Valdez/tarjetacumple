@@ -27,7 +27,7 @@ The system SHALL collect guest name, number of companions and an optional dedica
 - **THEN** the RSVP is persisted and a success confirmation is shown
 
 ### Requirement: Live confirmation counter
-The system SHALL display the number of confirmed guests and update it at least every 15 seconds.
+The system SHALL display the number of confirmed people and update it at least every 15 seconds.
 
 #### Scenario: Counter visible
 - **WHEN** a visitor loads the page
@@ -36,6 +36,10 @@ The system SHALL display the number of confirmed guests and update it at least e
 #### Scenario: Counter updates
 - **WHEN** 15 seconds pass after load
 - **THEN** the counter refreshes from the server
+
+#### Scenario: Counter counts people
+- **WHEN** an RSVP includes companions
+- **THEN** the counter adds the companions to the confirmed guest
 
 ### Requirement: Dedication privacy
 The system SHALL store dedications but SHALL NOT display them to Juli's account.

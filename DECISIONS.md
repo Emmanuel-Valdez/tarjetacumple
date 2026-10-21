@@ -116,12 +116,30 @@ Referencias (20):
 ## Spotify (v1)
 - v1: mock visual (lista + embed) para aprobación de diseño.
 - OAuth real (cuenta de Juli) se implementa después de aprobación.
-
 ## Abierto / por definir
+
 - ORM vs query builder (Drizzle recomendado por tipado).
 - Subida de fotos: ¿validar dimensiones mínimas?
 - Dominio de imágenes: servir directo desde volumen (sin astro:assets en runtime).
 - Diseño detallado de secciones cine/series.
+
+## Ronda 3 — decisiones (2026-10)
+
+- **Contenido en `src/data/`**: `event.ts` (fecha/lugar/Maps/Spotify), `costumes.ts` (22 disfraces con item + por qué + foto), `awards.ts` (premios con flag `revealed`), `gallery.ts` (generado). No se hardcodea copy en los `.astro`.
+- **Fotos del repo**: `src/img/*.jpg` → `public/photos/*.webp` con `npm run photos:prepare` (sharp, máx 1600px, q82). Se registran solas en la DB al arrancar (seed idempotente). Las fotos en `public/` se sirven estáticas; las subidas por admin viven en el volumen.
+- **Subida de imágenes**: sharp reescala a WebP (1600px, q82) en el server → ~100 KB por foto en vez de varios MB. Tope de entrada 12 MB. Sin límite de cantidad.
+- **Sharp** (`sharp@0.35.5`) como dependencia directa: es el análogo de SkiaSharp que usa VaultShop, pero native de Node.
+- **Galería**: carrusel horizontal minimalista, scroll infinito (3 copias de la pista, wrap en scroll), sin botones, arrastre con mouse — en el estilo de fddtour.com.ar.
+- **Hero**: `fondo.webp` de fondo fijo, entra nítido y se difumina (blur 9px + brightness 0.7) a los 2.4 s. `prefers-reduced-motion` lo muestra ya difuminado.
+- **Premios Oscar**: sección "Los Premios de la Noche" con copy que anuncia el concurso pero **no revela las categorías** (`revealed: false` → "Se anuncia en la noche"). Para destaparlas, cambiar el flag en `src/data/awards.ts`.
+- **Ubicación real**: Camping Centro de Empleados de Comercio, Mathus Hoyos 2525, El Bermejo, Guaymallén. Link de Maps con la place id.
+- **Contador de confirmados**: cuenta *personas* (1 + acompañantes), no filas.
+- **Deploy**: el build ocurre **en el VPS** (`git pull && docker compose build && up -d` por Tailscale SSH). No se publica imagen en GHCR. Compose usa `env_file: .env` y volumen `juli30_data` para db + uploads.
+- **`SESSION_SECRET` obligatorio en producción**: `src/lib/auth.ts` tira error si falta o es el valor de dev. Firma las cookies de sesión con HMAC: quien lo conozca puede suplantar a Juli o a la organizadora. Generar con `openssl rand -hex 32`.
+- **Cookies de sesión**: se agrega `Secure` cuando `NODE_ENV=production`.
+- **Admin**: ahora también gestiona canciones (listar/borrar) y fotos (listar/subir/borrar, con likes visibles).
+- **OpenSpec**: `tasks.md` actualizado con la sección 9 (contenido y diseño v2); specs de `landing`, `gallery`, `rsvp` y `admin` actualizadas.
+
 
 ## Respuestas (ronda 2)
 - Hora y dirección: placeholders por ahora. Dirección exacta se puede poner con link compartido de Google Maps ("Compartir" → copiar enlace).

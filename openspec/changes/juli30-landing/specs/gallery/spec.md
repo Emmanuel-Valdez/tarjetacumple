@@ -1,22 +1,26 @@
 ## Purpose
 
-Photo gallery in Instagram style with a carousel and persistent likes.
+Photo gallery with a minimalist horizontal carousel (infinite scroll, no buttons) and persistent likes.
 
 ## ADDED Requirements
 
-### Requirement: Instagram-style grid
-The system SHALL display photos in a grid layout similar to Instagram.
+### Requirement: Horizontal carousel
+The system SHALL display the photos in a single horizontal track that scrolls sideways, without navigation buttons.
 
-#### Scenario: Grid renders
+#### Scenario: Track renders
 - **WHEN** a visitor views the gallery
-- **THEN** photos are shown in a multi-column grid
+- **THEN** several photos are visible at once in one horizontal row
 
-### Requirement: Carousel view
-The system SHALL provide a carousel view of the photos.
+#### Scenario: Scroll works
+- **WHEN** the visitor swipes, scrolls the trackpad or drags with the mouse
+- **THEN** the photos move horizontally
 
-#### Scenario: Carousel navigable
-- **WHEN** a visitor uses the carousel
-- **THEN** they can move between photos
+### Requirement: Infinite scroll
+The system SHALL keep the track scrollable without showing an end.
+
+#### Scenario: No visible boundary
+- **WHEN** the visitor scrolls past the last photo
+- **THEN** the track seamlessly continues with more photos and never shows an empty edge
 
 ### Requirement: Persistent like
 The system SHALL let visitors like a photo and persist the like count.
@@ -31,3 +35,21 @@ The system SHALL prevent a visitor from liking the same photo more than once.
 #### Scenario: Duplicate like blocked
 - **WHEN** a visitor who already liked a photo clicks like again
 - **THEN** the like count does not increase
+
+### Requirement: Admin photo management
+The system SHALL let admins list, upload and delete gallery photos.
+
+#### Scenario: Upload is optimized
+- **WHEN** an admin uploads an image
+- **THEN** it is resized to at most 1600px on its longest edge, stored as WebP and appears in the gallery
+
+#### Scenario: Delete removes the photo
+- **WHEN** an admin deletes a photo
+- **THEN** it is removed from the gallery
+
+### Requirement: Seeded example photos
+The system SHALL ship the example photos converted to WebP and register them in the database on startup.
+
+#### Scenario: Seed is idempotent
+- **WHEN** the app starts more than once
+- **THEN** each example photo is registered only once

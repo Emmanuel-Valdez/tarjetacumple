@@ -43,9 +43,23 @@
 - [x] 7.3 Add copy/export RSVP list; verify clipboard
 - [x] 7.4 Build photo upload (validate type/size); verify stored
 - [x] 7.5 Role-based dedication visibility; verify Juli can't see them
+- [x] 7.6 Manage songs (list/delete) and photos (list/delete) from admin
+- [x] 7.7 Resize uploads to WebP with sharp (max 1600px, 12MB input cap)
 
 ## 8. Deploy & CI/CD
 
 - [x] 8.1 Create GitHub Actions (build → push → deploy); verify pipeline
 - [ ] 8.2 Configure VPS env and deploy; verify site live at subdomain
 - [ ] 8.3 Configure DNS + Cloudflare Full strict; verify HTTPS
+
+## 9. Contenido y diseño (v2)
+
+- [x] 9.1 Datos centralizados en `src/data/` (evento, disfraces, premios)
+- [x] 9.2 Ubicación real: Camping Centro de Empleados de Comercio + link de Maps
+- [x] 9.3 Sección "Premios de la Noche" con categorías en teaser (no reveladas)
+- [x] 9.4 Hero con foto de fondo que entra nítida y se difumina al hacer scroll
+- [x] 9.5 Galería: carrusel horizontal minimalista con scroll infinito, sin botones
+- [x] 9.6 Fotos de ejemplo en las tarjetas de disfraces (WebP, 22 referencias)
+- [x] 9.7 Copy de la playlist orientado a interacción ("¿Qué temazo no puede faltar?")
+- [x] 9.8 Contador de confirmados cuenta personas (incluye acompañantes)
+

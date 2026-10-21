@@ -44,6 +44,17 @@ The system SHALL let admins upload photos with validation of type and size.
 - **WHEN** an admin uploads an invalid file
 - **THEN** the upload is rejected with an error
 
+#### Scenario: Upload is resized
+- **WHEN** an admin uploads an image larger than 1600px
+- **THEN** it is resized and converted to WebP before being stored
+
+### Requirement: Song management
+The system SHALL let admins list and delete the songs guests added to the playlist.
+
+#### Scenario: Delete a song
+- **WHEN** an admin deletes a song
+- **THEN** it no longer appears in the public playlist
+
 ### Requirement: Dedication visibility by role
 The system SHALL show dedications only to the organizer, not to Juli.
 
