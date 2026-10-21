@@ -189,6 +189,14 @@ Referencias (20):
 - **Headers de seguridad**: los agrega el bloque `server` de Nginx (`Strict-Transport-Security`, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`). Van a nivel `server`, no en `location`, para que se hereden.
 - **OpenSpec**: `juli30-landing` y `front-polish` archivados en `openspec/changes/archive/2026-10-21-*` y sus deltas sincronizados a `openspec/specs/` (6 capabilities: admin, gallery, landing, music, playlist, rsvp). El requirement "Costume ideas carousel" se retiró de la spec de `landing` porque el carrusel de películas lo reemplaza (el delta no lo declaraba como `REMOVED`).
 - **Trampa de tooling**: `astro dev` mantiene un handle abierto sobre `openspec/changes/` y bloquea `Move-Item`/`Rename-Item` (Access denied) → hay que frenar el dev server antes de archivar un change. Además, `rtk` no debe envolver `astro dev --background`: no cierra la sesión.
-- **Privacidad**: la fecha, la hora, el lugar, la dirección y el nombre completo no se documentan (README, AGENTS, DECISIONS, HANDOFF, specs). La fuente única de contenido es `src/data/event.ts`. Los valores ya quedaron en el historial de git: para que no sigan accesibles, la palanca real es la visibilidad del repo (privado) o reescribir el historial.
+- **Privacidad**: la fecha, la hora, el lugar, la dirección y el nombre completo no se documentan (README, AGENTS, DECISIONS, specs). La fuente única de contenido es `src/data/event.ts`. Los valores ya quedaron en el historial de git: para que no sigan accesibles, la palanca real es la visibilidad del repo (privado) o reescribir el historial.
+
+## Ronda 7 — limpieza de contexto y pendientes
+
+- **`HANDOFF.md` se borra**: quedó obsoleto (decía "nada commiteado" y apuntaba a un change ya archivado). `README.md` + `DECISIONS.md` + `PROJECT_CONTEXT.local.md` son la referencia real.
+- **`PROJECT_CONTEXT.local.md`**: nuevo contexto local del repo (identidad, relación con el VPS del `_context/GLOBAL_CONTEXT.md`, stack, estado, reglas, riesgos, próximos pasos). Reemplaza a `PROJECT_CONTEXT_TEMPLATE.md`, que se borra. Va en `.gitignore` (no se versiona).
+- **`src/img/` se borra**: quedaban solo originales de alta calidad sin uso (4 archivos). Los `.webp` optimizados y versionados viven en `public/img/` (45 archivos). Los scripts `photos:prepare` / `movies:prepare` son aditivos y toleran que la carpeta no exista; para agregar fotos nuevas se vuelve a crear `src/img/` (gitignored) y se corre el script.
+- **`.env` local**: se deja como está. En producción las claves reales ya funcionan.
+- **Pendientes** (con paso a paso en `PROJECT_CONTEXT.local.md`): ID del playlist real de Spotify (hoy el embed apunta al "Today's Top Hits" genérico) y el pase de QA desde el celular.
 
 

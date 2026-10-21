@@ -49,5 +49,8 @@ npm-debug.log*
 # Claude Code (no se usa; los skills viven en .agents/skills/ y .opencode/skills/)
 .claude/
 
+# Contexto local del repo (no versionar)
+PROJECT_CONTEXT.local.md
+
 # OpenSpec / tooling (keep openspec/, ignore caches)
 .opencode/node_modules/
