@@ -1,89 +1,140 @@
 ---
 import Layout from '../layouts/Layout.astro';
-const costumes = [
-  'Pulp Fiction','Beetlejuice','Clueless','The Matrix','Barbie','El Extraño Mundo de Jack','Kill Bill','La Familia Addams','El Caballero de la Noche','El Diario de la Princesa','It','Scream','El Quinto Elemento','El Cisne Negro','Legalmente Rubia','La Casa de Papel','Bastardos Sin Gloria','Midsommar','El Gran Lebowski','Joker','Harry Potter','El Señor de los Anillos',
-];
+import { EVENT } from '../data/event';
+import { COSTUMES } from '../data/costumes';
+import { AWARDS, AWARDS_INTRO } from '../data/awards';
+import { GALLERY } from '../data/gallery';
+
+const awards = AWARDS.filter((a) => a.revealed);
 ---
-<Layout title="Juli cumple 30">
-  <section class="flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
-    <p class="text-neon-cyan neon-text text-sm tracking-widest uppercase">Estreno · 10 de enero de 2027</p>
-    <h1 class="text-5xl font-bold text-neon-magenta neon-text sm:text-7xl">Juli cumple 30</h1>
-    <p class="max-w-xl text-lg text-gray-300">
+
+<Layout title={`${EVENT.name} cumple 30`}>
+  <!-- Hero: la imagen de fondo entra nitida y se difumina al hacer scroll -->
+  <div class="hero-bg" aria-hidden="true"></div>
+
+  <section class="relative flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
+    <p class="text-neon-cyan neon-text text-sm tracking-widest uppercase">Estreno · {EVENT.date}</p>
+    <h1 class="text-5xl font-bold text-neon-magenta neon-text sm:text-7xl">{EVENT.name} cumple 30</h1>
+    <p class="max-w-xl text-lg text-gray-200">
       Algunas historias merecen una secuela. La mía cumple 30 y la fiesta es de disfraces. ¿Te sumás al reparto?
     </p>
-    <div id="countdown" class="flex gap-4 text-neon-green neon-text font-mono text-2xl" aria-live="polite" aria-label="Cuenta regresiva">
+    <div id="countdown" data-target={EVENT.dateISO} class="flex gap-4 text-neon-green neon-text font-mono text-2xl" role="timer" aria-label="Cuenta regresiva para la fiesta">
       <span data-part="d">--d</span><span data-part="h">--h</span><span data-part="m">--m</span><span data-part="s">--s</span>
     </div>
-    <button id="rsvp-open" class="rounded bg-neon-magenta px-6 py-3 font-semibold text-black hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-neon-cyan">Confirmar asistencia</button>
-    <p class="text-sm text-gray-400">Confirmados: <span id="counter">0</span></p>
+    <div class="flex flex-col items-center gap-3">
+      <button id="rsvp-open" class="rounded bg-neon-magenta px-6 py-3 font-semibold text-black hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-neon-cyan focus:ring-offset-2 focus:ring-offset-cinema-black">Confirmar asistencia</button>
+      <p class="text-sm text-gray-300">Ya confirmaron: <span id="counter">0</span> personas</p>
+    </div>
   </section>
 
-  <section id="ubicacion" class="mx-auto max-w-2xl px-4 py-16 text-center">
-    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-4">Ubicación</h2>
-    <p class="text-gray-300 mb-2">Dirección placeholder — se actualiza con el link de Maps</p>
-    <a href="https://maps.google.com" target="_blank" rel="noopener" class="text-neon-magenta underline">Ver en Google Maps</a>
+  <!-- Ubicacion -->
+  <section id="ubicacion" class="relative mx-auto max-w-2xl px-4 py-16 text-center">
+    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-4">Dónde y cuándo</h2>
+    <p class="text-xl text-gray-100 font-semibold">{EVENT.venue}</p>
+    <p class="text-gray-300 mt-1">{EVENT.address}</p>
+    <p class="text-neon-green neon-text mt-3 text-lg">{EVENT.date} · {EVENT.time}</p>
+    <a href={EVENT.mapsUrl} target="_blank" rel="noopener" class="mt-5 inline-block rounded border border-neon-cyan px-4 py-2 text-neon-cyan hover:bg-neon-cyan hover:text-black focus:outline-none focus:ring-2 focus:ring-neon-magenta">Ver en Google Maps</a>
   </section>
 
-  <section class="mx-auto max-w-4xl px-4 py-16">
-    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-4 text-center">Dress code</h2>
-    <p class="text-center text-gray-300">Disfraz obligatorio. Si venís de civil, te toca ser extra de fondo 🎬</p>
+  <!-- Banda con foto de fiesta difuminada -->
+  <div class="banda-fiesta" style={`--foto: url('${GALLERY[1].file}')`} role="img" aria-label="Foto de la fiesta de disfraces"></div>
+
+  <!-- Dress code -->
+  <section class="relative mx-auto max-w-2xl px-4 py-16 text-center">
+    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-4">Dress code</h2>
+    <p class="text-gray-200">Disfraz obligatorio y temático. Si venís de civil, te toca ser extra de fondo.</p>
   </section>
 
-  <section class="mx-auto max-w-4xl px-4 py-16">
-    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-4 text-center">Ideas de disfraz</h2>
-    <div id="carousel" class="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4" tabindex="0" aria-label="Carrusel de disfraces">
-      {costumes.map((c) => (
-        <article class="snap-start shrink-0 w-64 rounded border border-neon-cyan/30 p-4">
-          <h3 class="font-semibold text-neon-magenta">{c}</h3>
-          <p class="text-sm text-gray-400 mt-2">Item característico (placeholder)</p>
+  <!-- Ideas de disfraz -->
+  <section class="relative mx-auto max-w-5xl px-4 py-16">
+    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-2 text-center">Ideas de disfraz</h2>
+    <p class="text-center text-sm text-gray-400 mb-8">22 referencias para inspirarte. Una de estas es la tuya.</p>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {COSTUMES.map((c) => (
+        <article class="overflow-hidden rounded-lg border border-neon-cyan/25 bg-gray-950/60">
+          {c.photo && (
+            <img src={c.photo} alt="" loading="lazy" class="aspect-[4/3] w-full object-cover opacity-90" />
+          )}
+          <div class="p-4">
+            <h3 class="font-semibold text-neon-magenta flex items-center gap-2">
+              <span aria-hidden="true">{c.emoji}</span> {c.title}
+            </h3>
+            <p class="text-sm text-gray-200 mt-2"><span class="text-gray-500">El toque:</span> {c.item}</p>
+            <p class="text-sm text-gray-400 mt-2">{c.why}</p>
+          </div>
         </article>
       ))}
     </div>
   </section>
 
-  <section class="mx-auto max-w-2xl px-4 py-16">
-    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-4 text-center">Playlist</h2>
-    <iframe class="w-full aspect-video rounded" src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-    <form id="track-form" class="mt-4 flex flex-col gap-2 sm:flex-row">
-      <input name="title" placeholder="Canción" required class="flex-1 rounded bg-gray-900 px-3 py-2 border border-gray-700 focus:border-neon-cyan focus:outline-none" />
-      <input name="artist" placeholder="Artista" required class="flex-1 rounded bg-gray-900 px-3 py-2 border border-gray-700 focus:border-neon-cyan focus:outline-none" />
-      <button class="rounded bg-neon-green px-4 py-2 text-black font-semibold">Agregar</button>
+  <!-- Premios -->
+  <section id="premios" class="relative mx-auto max-w-4xl px-4 py-16">
+    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-4 text-center">Los Premios de la Noche</h2>
+    <p class="text-center text-gray-200 max-w-2xl mx-auto">{AWARDS_INTRO}</p>
+    {awards.length > 0 && (
+      <ul class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {awards.map((a) => (
+          <li class="rounded border border-cinema-gold/40 bg-gray-950/60 p-3 text-sm">
+            <span aria-hidden="true">{a.emoji}</span> <span class="font-semibold text-cinema-gold">{a.title}</span>
+          </li>
+        ))}
+      </ul>
+    )}
+    <p class="text-center text-sm text-gray-500 mt-6">Las categorías se anuncian en el momento. Venite con el disfraz resuelto.</p>
+  </section>
+
+  <!-- Playlist -->
+  <section class="relative mx-auto max-w-2xl px-4 py-16">
+    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-2 text-center">La banda sonora</h2>
+    <p class="text-center text-gray-200 mb-6">¿Qué temazo no puede faltar esta noche? Sumá la tuya y armamos la playlist entre todos.</p>
+    <iframe class="w-full aspect-video rounded" src={`https://open.spotify.com/embed/playlist/${EVENT.spotifyPlaylist}`} allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" title="Playlist de la fiesta"></iframe>
+    <form id="track-form" class="mt-6 flex flex-col gap-2 sm:flex-row">
+      <label for="track-title" class="sr-only">Canción</label>
+      <input id="track-title" name="title" placeholder="Canción" required maxlength="100" class="flex-1 rounded bg-gray-900 px-3 py-2 border border-gray-700 focus:border-neon-cyan focus:outline-none" />
+      <label for="track-artist" class="sr-only">Artista</label>
+      <input id="track-artist" name="artist" placeholder="Artista" required maxlength="100" class="flex-1 rounded bg-gray-900 px-3 py-2 border border-gray-700 focus:border-neon-cyan focus:outline-none" />
+      <button class="rounded bg-neon-green px-4 py-2 text-black font-semibold hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-neon-cyan">Sumar</button>
     </form>
-    <ul id="track-list" class="mt-4 space-y-2 text-sm text-gray-300"></ul>
+    <p id="track-status" class="text-sm text-neon-green mt-2" role="status" aria-live="polite"></p>
+    <ul id="track-list" class="mt-4 space-y-2 text-sm text-gray-200"></ul>
   </section>
 
-  <section class="mx-auto max-w-4xl px-4 py-16">
-    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-4 text-center">Galería</h2>
-    <div id="gallery-grid" class="grid grid-cols-2 gap-2 sm:grid-cols-3"></div>
-    <div id="gallery-carousel" class="mt-6 flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4"></div>
+  <!-- Galeria: carrusel horizontal con scroll infinito, sin botones -->
+  <section class="relative py-16">
+    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-2 text-center px-4">El backstage</h2>
+    <p class="text-center text-sm text-gray-400 mb-8 px-4">Deslizá para ver más. Tapá el corazón para dejar tu like.</p>
+    <div id="gallery" class="gallery-track" tabindex="0" role="region" aria-label="Galería de fotos de la fiesta">
+      <div class="gallery-pista" id="gallery-pista"></div>
+    </div>
   </section>
 
+  <!-- RSVP modal -->
   <dialog id="rsvp-modal" class="rounded-lg bg-gray-900 text-gray-100 p-6 w-full max-w-md backdrop:bg-black/70">
     <form id="rsvp-form" class="space-y-4">
       <h2 class="text-xl font-bold text-neon-magenta">Confirmar asistencia</h2>
       <div>
         <label for="name" class="block text-sm mb-1">Nombre</label>
-        <input id="name" name="name" required class="w-full rounded bg-gray-800 px-3 py-2 border border-gray-700 focus:border-neon-cyan focus:outline-none" />
+        <input id="name" name="name" required maxlength="100" class="w-full rounded bg-gray-800 px-3 py-2 border border-gray-700 focus:border-neon-cyan focus:outline-none" />
       </div>
       <div>
         <label for="companions" class="block text-sm mb-1">Acompañantes</label>
-        <input id="companions" name="companions" type="number" min="0" value="0" class="w-full rounded bg-gray-800 px-3 py-2 border border-gray-700 focus:border-neon-cyan focus:outline-none" />
+        <input id="companions" name="companions" type="number" min="0" max="20" value="0" class="w-full rounded bg-gray-800 px-3 py-2 border border-gray-700 focus:border-neon-cyan focus:outline-none" />
       </div>
       <div>
         <label for="dedication" class="block text-sm mb-1">Dedicatoria (opcional)</label>
-        <textarea id="dedication" name="dedication" rows="3" class="w-full rounded bg-gray-800 px-3 py-2 border border-gray-700 focus:border-neon-cyan focus:outline-none"></textarea>
+        <textarea id="dedication" name="dedication" rows="3" maxlength="500" class="w-full rounded bg-gray-800 px-3 py-2 border border-gray-700 focus:border-neon-cyan focus:outline-none"></textarea>
       </div>
       <div class="flex justify-end gap-2">
-        <button type="button" id="rsvp-close" class="px-4 py-2 text-gray-400 hover:text-white">Cerrar</button>
-        <button type="submit" class="rounded bg-neon-magenta px-4 py-2 text-black font-semibold">Enviar</button>
+        <button type="button" id="rsvp-close" class="px-4 py-2 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-neon-cyan">Cerrar</button>
+        <button type="submit" class="rounded bg-neon-magenta px-4 py-2 text-black font-semibold hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-neon-cyan">Enviar</button>
       </div>
       <p id="rsvp-status" class="text-sm" role="status" aria-live="polite"></p>
     </form>
   </dialog>
 
   <script>
-    const target = new Date('2027-01-10T00:00:00-03:00').getTime();
     const cd = document.getElementById('countdown')!;
+    const target = new Date(cd.dataset.target!).getTime();
     function tick() {
       const diff = target - Date.now();
       if (diff <= 0) { cd.textContent = '¡Es hoy!'; return; }
@@ -129,7 +180,7 @@ const costumes = [
       };
       const r = await fetch('/api/rsvp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       if (r.ok) {
-        status.textContent = '¡Gracias por confirmar!';
+        status.textContent = '¡Gracias por confirmar! Nos vemos en el cine.';
         form.reset();
         refreshCounter();
       } else {
@@ -148,52 +199,91 @@ const costumes = [
       for (const t of j.tracks || []) {
         const li = document.createElement('li');
         const q = encodeURIComponent(`${t.title} ${t.artist}`);
-        li.innerHTML = `<span class="text-gray-200">${esc(t.title)}</span> <span class="text-gray-500">— ${esc(t.artist)}</span> <a href="https://open.spotify.com/search/${q}" target="_blank" rel="noopener" class="text-neon-green underline ml-2">buscar</a>`;
+        li.innerHTML = `<span class="text-gray-100">${esc(t.title)}</span> <span class="text-gray-500">— ${esc(t.artist)}</span> <a href="https://open.spotify.com/search/${q}" target="_blank" rel="noopener" class="text-neon-green underline ml-2">buscar</a>`;
         ul.appendChild(li);
       }
     }
     loadTracks();
     const trackForm = document.getElementById('track-form') as HTMLFormElement;
+    const trackStatus = document.getElementById('track-status')!;
     trackForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const fd = new FormData(trackForm);
       const payload = { title: String(fd.get('title') || ''), artist: String(fd.get('artist') || '') };
       const r = await fetch('/api/tracks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-      if (r.ok) { trackForm.reset(); loadTracks(); }
+      if (r.ok) { trackStatus.textContent = '¡Sumada!'; trackForm.reset(); loadTracks(); }
+      else { trackStatus.textContent = 'No se pudo agregar.'; }
     });
 
-    // Gallery
+    // Galeria: carrusel horizontal con scroll infinito (duplica la pista y reacomoda)
+    const pista = document.getElementById('gallery-pista')!;
+    const gal = document.getElementById('gallery')!;
+
+    function cardHtml(p: any) {
+      return `<figure class="gallery-item">
+        <img src="${esc(p.url)}" alt="${esc(p.alt)}" loading="lazy" class="w-full h-full object-cover" />
+        <button data-id="${p.id}" class="like-btn absolute bottom-2 right-2 bg-black/60 rounded-full px-3 py-1 text-sm text-white flex items-center gap-1" aria-label="Me gusta esta foto">
+          <span class="heart" aria-hidden="true">${p.liked ? '❤️' : '🤍'}</span> <span class="count">${p.likes}</span>
+        </button>
+      </figure>`;
+    }
+
     async function loadGallery() {
       const r = await fetch('/api/photos');
       const j = await r.json();
-      const grid = document.getElementById('gallery-grid')!;
-      const car = document.getElementById('gallery-carousel')!;
-      grid.innerHTML = ''; car.innerHTML = '';
-      for (const p of j.photos || []) {
-        const card = document.createElement('div');
-        card.className = 'relative group';
-        card.innerHTML = `<img src="${esc(p.url)}" alt="${esc(p.alt)}" loading="lazy" class="w-full aspect-square object-cover rounded" />
-          <button data-id="${p.id}" class="like-btn absolute bottom-2 right-2 bg-black/60 rounded-full px-3 py-1 text-sm text-white flex items-center gap-1">
-            <span class="heart">${p.liked ? '❤️' : '🤍'}</span> <span class="count">${p.likes}</span>
-          </button>`;
-        grid.appendChild(card);
-        const carCard = document.createElement('div');
-        carCard.className = 'snap-start shrink-0 w-72';
-        carCard.innerHTML = `<img src="${esc(p.url)}" alt="${esc(p.alt)}" loading="lazy" class="w-full aspect-[4/3] object-cover rounded" />`;
-        car.appendChild(carCard);
-      }
-      grid.querySelectorAll('.like-btn').forEach((btn) => {
+      const photos = j.photos || [];
+      const html = photos.map(cardHtml).join('');
+      // 3 copias para que al hacer scroll nunca se vea el borde
+      pista.innerHTML = html + html + html;
+      const width = pista.scrollWidth / 3;
+      gal.scrollLeft = width;
+      bindLikes();
+    }
+
+    function bindLikes() {
+      pista.querySelectorAll('.like-btn').forEach((btn) => {
         btn.addEventListener('click', async () => {
           const id = Number((btn as HTMLElement).dataset.id);
           const r = await fetch('/api/likes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ photoId: id }) });
           if (r.ok) {
             const j = await r.json();
-            (btn.querySelector('.count') as HTMLElement).textContent = String(j.likes);
-            (btn.querySelector('.heart') as HTMLElement).textContent = '❤️';
+            pista.querySelectorAll(`.like-btn[data-id="${id}"]`).forEach((b) => {
+              (b.querySelector('.count') as HTMLElement).textContent = String(j.likes);
+              (b.querySelector('.heart') as HTMLElement).textContent = '❤️';
+            });
           }
         });
       });
     }
+
+    // Scroll infinito: al llegar al final, salta una copia atras
+    gal.addEventListener('scroll', () => {
+      const width = pista.scrollWidth / 3;
+      if (!width) return;
+      if (gal.scrollLeft >= width * 2) gal.scrollLeft -= width;
+      else if (gal.scrollLeft <= 0) gal.scrollLeft += width;
+    }, { passive: true });
+
+    // Arrastre con mouse (en el celu ya scrollea nativo)
+    let drag = false;
+    let startX = 0;
+    let startLeft = 0;
+    gal.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      drag = true;
+      startX = e.clientX;
+      startLeft = gal.scrollLeft;
+      gal.classList.add('dragging');
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      gal.scrollLeft = startLeft - (e.clientX - startX);
+    });
+    window.addEventListener('pointerup', () => {
+      drag = false;
+      gal.classList.remove('dragging');
+    });
+
     loadGallery();
   </script>
 </Layout>

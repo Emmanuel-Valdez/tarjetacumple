@@ -11,8 +11,8 @@ const schema = z.object({
 });
 
 export const GET: APIRoute = async () => {
-  const rows = await db.select({ count: sql<number>`count(*)` }).from(rsvps);
-  const count = rows[0]?.count ?? 0;
+  const rows = await db.select({ count: sql<number>`coalesce(sum(1 + companions), 0)` }).from(rsvps);
+  const count = Number(rows[0]?.count ?? 0);
   return Response.json({ count });
 };
 
@@ -23,6 +23,6 @@ export const POST: APIRoute = async ({ request }) => {
   if (!parsed.success) return Response.json({ error: 'invalid data' }, { status: 400 });
   const { name, companions, dedication } = parsed.data;
   await db.insert(rsvps).values({ name, companions, dedication: dedication || null });
-  const rows = await db.select({ count: sql<number>`count(*)` }).from(rsvps);
-  return Response.json({ ok: true, count: rows[0]?.count ?? 0 });
+  const rows = await db.select({ count: sql<number>`coalesce(sum(1 + companions), 0)` }).from(rsvps);
+  return Response.json({ ok: true, count: Number(rows[0]?.count ?? 0) });
 };

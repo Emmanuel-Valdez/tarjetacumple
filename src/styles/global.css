@@ -23,3 +23,64 @@
 .neon-text {
   text-shadow: 0 0 6px currentColor, 0 0 12px currentColor;
 }
+
+/* Fondo del cine: entra nitido al abrir y se difumina para que se lea el texto. */
+.hero-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: url('/fondo.webp');
+  background-size: cover;
+  background-position: center;
+  filter: blur(0px) brightness(1);
+  animation: hero-blur 2.4s ease-out forwards;
+  transform: translateZ(0);
+}
+@keyframes hero-blur {
+  to { filter: blur(9px) brightness(0.7); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-bg { animation: none; filter: blur(9px) brightness(0.7); }
+}
+
+/* Banda con foto de fiesta difuminada entre secciones. */
+.banda-fiesta {
+  height: 14rem;
+  background-image: var(--foto);
+  background-size: cover;
+  background-position: center;
+  filter: blur(6px) saturate(1.2);
+  transform: scale(1.05);
+}
+
+/* Galeria: scroll horizontal real, sin botones, con arrastre con mouse. */
+.gallery-track {
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  cursor: grab;
+  touch-action: pan-x;
+  padding: 0 1rem;
+}
+.gallery-track::-webkit-scrollbar { display: none; }
+.gallery-track.dragging { cursor: grabbing; scroll-snap-type: none; }
+.gallery-pista {
+  display: flex;
+  gap: 0.75rem;
+  width: max-content;
+}
+.gallery-item {
+  position: relative;
+  flex: none;
+  height: clamp(11rem, 28vw, 18rem);
+  width: clamp(11rem, 28vw, 18rem);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  scroll-snap-align: center;
+  background: #15151c;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-bg { animation: none; }
+}
