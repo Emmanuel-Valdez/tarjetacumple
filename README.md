@@ -1,9 +1,8 @@
-# Tarjeta Cumple — Juli 30
+# Tarjeta Cumple — Invitación web (Astro SSR)
 
-Invitación web para el cumpleaños 30 de **Julieta "Juli" Rosales**.
-**9 de enero de 2027, 22:00 h** · Camping Centro de Empleados de Comercio, Mathus Hoyos 2525, El Bermejo, Guaymallén (Mendoza).
+Invitación web de cumpleaños con tema *fiesta en el cine*: disfraces de películas/series, premios "Oscar" de la noche y banda sonora entre todos.
 
-Tema: *fiesta en el cine* — disfraces de películas/series, premios "Oscar" de la noche, banda sonora entre todos.
+> **Sin datos personales en el README** (decisión de privacidad): la fecha, la hora, el lugar y la dirección no se documentan acá. Viven en un único lugar, `src/data/event.ts` (fuente de contenido).
 
 ## Stack
 

@@ -29,8 +29,7 @@ Se usa YouTube IFrame API sin npm. Ojo: los navegadores **bloquean autoplay con 
 sin interacción previa → arranca muteado y hace unmute al primer clic. Es el diseño
 documentado en `design.md`, no un bug.
 
-**Fecha (punto 2)**: sábado 9/1/2027 22:00 ART = `2027-01-09T22:00:00-03:00`.
-Argentina es UTC-3 fijo (sin DST desde 2009). Ojo: el countdown de `index.astro`
+**Fecha (punto 2)**: la de `src/data/event.ts` (ART = UTC-3 fijo, sin DST desde 2009). Ojo: el countdown de `index.astro`
 tiene la fecha **hardcodeada** en el `<script>` inline → hay que inyectarla
 (tasks 1.2).
 

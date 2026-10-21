@@ -65,11 +65,11 @@
 ## 9. Verificación y docs
 
 - [x] 9.1 `npm run check` (0 errores) y `npm run build` (SSR) pasan
-- [x] 9.2 Verificación manual en `http://localhost:4321/` con Playwright a 390px y 1280px: scroll lateral, h1, `<title>`, favicon, fondo responsive (vertical/horizontal) y blur al scrollear, secciones nuevas, disfraces (18), premios visibles, carrusel de películas, decoración parallax, música
+- [x] 9.2 Verificación manual en `http://localhost:4321/` con Playwright a 390px y 1280px: scroll lateral, h1, `<title>`, favicon, fondo responsive (vertical/horizontal) y blur al scrollear, secciones nuevas, premios visibles, carrusel de películas dividido en dos filas, decoración parallax, música
 - [x] 9.3 Consola del browser sin errores
-- [x] 9.4 Actualizar `DECISIONS.md` con las decisiones de este change (fecha real, fondo en 2 capas, YouTube IFrame API, premios visibles)
+- [x] 9.4 Actualizar `DECISIONS.md` con las decisiones de este change (fecha real, fondo responsive único, YouTube IFrame API, premios visibles)
 - [x] 9.5 Actualizar `README.md` si cambió algo de la estructura (favicon, assets)
-- [x] 9.6 Marcar en `openspec/changes/juli30-landing/tasks.md` los ítems 8.2/8.3 de deploy como pendientes (siguen bloqueados por el VPS)
+- [x] 9.6 Deploy completado: `juli30.evaldez.ar` live, Cloudflare Full (strict) y headers de seguridad verificados
 
 ## 10. Nota: carpeta `.claude/`
 

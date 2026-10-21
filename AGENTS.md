@@ -1,7 +1,8 @@
 ## Proyecto
 
-Invitación web del cumpleaños 30 de Juli (10/01/2027, Mendoza). Astro SSR + SQLite + Docker.
+Invitación web de cumpleaños con tema cine. Astro SSR + SQLite + Docker.
 Ver `README.md` para stack, comandos y deploy. `DECISIONS.md` tiene el historial de decisiones.
+Los datos del evento (fecha, hora, lugar, dirección) están en `src/data/event.ts`: no los repitas en la documentación ni en el README.
 
 ## Development
 
@@ -12,6 +13,11 @@ astro dev --background
 ```
 
 Manejo: `astro dev stop`, `astro dev status`, `astro dev logs`.
+
+Dos trampas:
+
+- **No lo lances con `rtk`**: el wrapper no cierra la sesión y el comando queda colgado. Ejecutalo crudo (`npx astro dev --background`).
+- **El dev server bloquea `openspec/changes/`**: mantiene un handle abierto sobre esas carpetas, así que `astro dev stop` antes de mover o renombrar un change (archivar) y volvé a levantarlo después.
 
 Antes de tocar la UI, corré `npm run check` (types) y `npm run build` (SSR). El dev server ya hot-reloadea, pero el build es el que valida el output de producción.
 
@@ -40,7 +46,7 @@ Antes de tocar la UI, corré `npm run check` (types) y `npm run build` (SSR). El
 
 ## OpenSpec
 
-Los cambios de alcance se documentan en `openspec/changes/`. Specs por capability en `openspec/changes/juli30-landing/specs/`. Actualizá `tasks.md` al avanzar.
+Los cambios de alcance se documentan en `openspec/changes/`. Al terminar, se archivan en `openspec/changes/archive/` y sus specs se sincronizan a `openspec/specs/<capability>/spec.md` (ahi vive la spec vigente). Los changes `juli30-landing` y `front-polish` ya están archivados; `openspec/specs/` tiene las 6 capabilities (admin, gallery, landing, music, playlist, rsvp). Actualizá `tasks.md` al avanzar.
 
 ## Documentación
 

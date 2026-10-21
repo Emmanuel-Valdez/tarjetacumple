@@ -115,7 +115,7 @@ Se borra el flag `revealed` de `awards.ts` y el filtro `AWARDS.filter(a => a.rev
    - hero con `fondo.webp` nítido, blur solo al scrollear
    - botón de música: mutea, unmutea, pausa, reanuda
    - favicon zombie visible
-4. Merge a `main` → el workflow de deploy hace el build en el VPS.
+4. Push a `master` → el workflow de deploy hace el build en el VPS.
 
 **Rollback:** `git revert` del commit. Sin migraciones de DB, no hay rollback de datos.
 

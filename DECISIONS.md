@@ -1,8 +1,8 @@
 # Decisiones — Tarjeta Cumple (Juli 30)
 
 ## Proyecto
-- Invitación web para cumpleaños 30 de **Julieta "Juli" Rosales**.
-- Fecha del evento: **sábado 9 de enero de 2027, 22:00 h** (ART, UTC-3 fijo, sin DST).
+- Invitación web de cumpleaños 30 con temática cine (disfrazes de películas/series).
+- Fecha, hora y lugar: los define `src/data/event.ts` (fuente única; no se repiten en los docs). Zona ART = UTC-3 fijo, sin DST.
 - Subdominio: `juli30.evaldez.ar`.
 - Temática: fiesta de disfraces con referencias a películas/series icónicas.
 - Estilo visual: negro + dorado + rojo cortina, tira de film, claqueta, "próximo estreno".
@@ -132,7 +132,7 @@ Referencias (20):
 - **Galería**: carrusel horizontal minimalista, scroll infinito (3 copias de la pista, wrap en scroll), sin botones, arrastre con mouse — en el estilo de fddtour.com.ar.
 - **Hero**: `fondo.webp` de fondo fijo, entra nítido y se difumina (blur 9px + brightness 0.7) a los 2.4 s. `prefers-reduced-motion` lo muestra ya difuminado. *(Superado en Ronda 5 por el fondo único que se difumina al scrollear.)*
 - **Premios Oscar**: sección "Los Premios de la Noche". *(En Ronda 4 pasan a categorías siempre visibles.)*
-- **Ubicación real**: Camping Centro de Empleados de Comercio, Mathus Hoyos 2525, El Bermejo, Guaymallén. Link de Maps con la place id.
+- **Ubicación real**: la de `src/data/event.ts` (con place id de Maps).
 - **Contador de confirmados**: cuenta *personas* (1 + acompañantes), no filas.
 - **Deploy**: el build ocurre **en el VPS** (`git pull && docker compose build && up -d` por Tailscale SSH). No se publica imagen en GHCR. Compose usa `env_file: .env` y volumen `juli30_data` para db + uploads.
 - **`SESSION_SECRET` obligatorio en producción**: `src/lib/auth.ts` tira error si falta o es el valor de dev. Firma las cookies de sesión con HMAC: quien lo conozca puede suplantar a Juli o a la organizadora. Generar con `openssl rand -hex 32`.
@@ -162,7 +162,7 @@ Referencias (20):
 
 ## Ronda 4 — front-polish (change `front-polish`)
 
-- **Fecha real**: sábado **9 de enero de 2027, 22:00 h** (ART = UTC-3 fijo; Argentina no usa DST). `event.ts` centraliza `date`, `time` y `dateISO` (`2027-01-09T22:00:00-03:00`); el countdown lee `EVENT.dateISO`.
+- **Fecha real**: la de `src/data/event.ts` (`date`, `time` y `dateISO`; ART = UTC-3 fijo, Argentina no usa DST). El countdown lee `EVENT.dateISO`.
 - **Scroll lateral**: la causa era `.banda-fiesta` con `transform: scale(1.05)` (el transform suma al overflow visual). Se reemplaza por `background-size: 108%` y se agrega `body { overflow-x: clip }` como red de seguridad (`clip`, no `hidden`, para no romper `position: sticky` ni recortar focus rings).
 - **Fondo en dos capas**: `.fondo-cine` muestra `fondo.webp` **entero y nítido** (`contain` + letterbox del color de fondo) y `.fondo-fiesta` (foto de la fiesta con `blur(18px)`) entra al scrollear vía `IntersectionObserver` sobre el hero. Se elimina el `@keyframes hero-blur`. `prefers-reduced-motion` quita la transición. *(Superado en Ronda 5: un solo fondo, horizontal en desktop y vertical en mobile, que se difumina al scrollear.)*
 - **Identidad**: `<h1>` = "Juli: tener 30, ser coqueta y prospera"; `<title>` = "Juli: capitulo 30, la pelicula". Favicon zombie de MJ dibujado a mano en `public/img/favicon.svg`, rasterizado con sharp a `apple-touch-icon.png` (180) e `icon-512.png` (512). El `.ico` legacy se descarta (sharp no emite `.ico`).
@@ -182,4 +182,13 @@ Referencias (20):
 - **Ideas de disfraz**: se elimina la sección completa (grid + subtítulo) y `src/data/costumes.ts`. La reemplaza el carrusel: cada fila muestra la mitad de las imágenes (arriba la primera, abajo la segunda) y la animación baja a 55 s para que no se trabe.
 - **Decoración parallax**: se descarta el confeti animado. En su lugar hay 4 globos y 6 confetis fijos que suben solo al scrollear, a velocidades distintas (efecto de profundidad) y sin bucle de animación. Con `prefers-reduced-motion` quedan estáticos.
 - **Título de pestaña**: "Juli: capitulo 30, la pelicula" (reemplaza a "Juli: De repente 30").
+
+## Ronda 6 — deploy, archivo de changes y privacidad de los datos
+
+- **Deploy**: `juli30.evaldez.ar` live detrás de Cloudflare (Full strict) + Nginx (Let's Encrypt) → `127.0.0.1:3000`. CI/CD: `tailscale/github-action@v3` + `appleboy/ssh-action` con `VPS_SSH_KEY`; en el VPS `git pull --ff-only && docker compose build && docker compose up -d`. El health check del workflow reintenta (`curl --retry 10 --retry-all-errors --retry-delay 2`) porque la app tarda en levantar.
+- **Headers de seguridad**: los agrega el bloque `server` de Nginx (`Strict-Transport-Security`, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`). Van a nivel `server`, no en `location`, para que se hereden.
+- **OpenSpec**: `juli30-landing` y `front-polish` archivados en `openspec/changes/archive/2026-10-21-*` y sus deltas sincronizados a `openspec/specs/` (6 capabilities: admin, gallery, landing, music, playlist, rsvp). El requirement "Costume ideas carousel" se retiró de la spec de `landing` porque el carrusel de películas lo reemplaza (el delta no lo declaraba como `REMOVED`).
+- **Trampa de tooling**: `astro dev` mantiene un handle abierto sobre `openspec/changes/` y bloquea `Move-Item`/`Rename-Item` (Access denied) → hay que frenar el dev server antes de archivar un change. Además, `rtk` no debe envolver `astro dev --background`: no cierra la sesión.
+- **Privacidad**: la fecha, la hora, el lugar, la dirección y el nombre completo no se documentan (README, AGENTS, DECISIONS, HANDOFF, specs). La fuente única de contenido es `src/data/event.ts`. Los valores ya quedaron en el historial de git: para que no sigan accesibles, la palanca real es la visibilidad del repo (privado) o reescribir el historial.
+
 
