@@ -116,9 +116,9 @@ Copia `.env.example` a `.env` y cambiá las claves.
 El build ocurre **en el VPS** (el paquete de Docker no se publica).
 
 1. En el VPS: `git clone <repo> /opt/juli30/app`, crear `/opt/juli30/app/.env` con las claves reales, y `docker compose up -d` una vez para crear el volumen.
-2. `git push master` dispara `.github/workflows/deploy.yml` → por Tailscale SSH hace `git pull && docker compose build && docker compose up -d` en `/opt/juli30/app`.
+2. `git push master` dispara `.github/workflows/deploy.yml` → conecta a Tailscale y por SSH hace `git pull && docker compose build && docker compose up -d` en `/opt/juli30/app`.
 3. Nginx (ver `nginx.conf.example`) hace de reverse proxy TLS → `127.0.0.1:3000`. Cloudflare en modo *Full (strict)*.
-4. Secretos de GitHub: `VPS_USER`, `VPS_HOST`, `TS_OAUTH_CLIENT_ID`, `TS_OAUTH_SECRET`.
+4. Secretos de GitHub: `VPS_USER`, `VPS_HOST`, `VPS_SSH_KEY`, `TAILSCALE_OAUTH_CLIENT_ID`, `TAILSCALE_OAUTH_SECRET`.
 
 El volumen `juli30_data` guarda `db.sqlite` y `uploads/`: **no se pierde al redeploy**.
 
