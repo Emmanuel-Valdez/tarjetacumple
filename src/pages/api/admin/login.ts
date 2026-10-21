@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
-import { checkPassword, signSession, rateLimit } from '../../../lib/auth';
+import { checkPassword, signSession, rateLimit, isSecure } from '../../../lib/auth';
 
 const schema = z.object({
   username: z.string().min(1),
@@ -25,6 +25,6 @@ export const POST: APIRoute = async ({ request }) => {
   if (!role) return Response.json({ error: 'invalid credentials' }, { status: 401 });
   const token = signSession(role);
   const res = Response.json({ ok: true, role });
-  res.headers.append('Set-Cookie', `admin_session=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${60*60*24*7}`);
+  res.headers.append('Set-Cookie', `admin_session=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${60*60*24*7}${isSecure ? '; Secure' : ''}`);
   return res;
 };

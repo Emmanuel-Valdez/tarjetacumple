@@ -1,8 +1,20 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
-
-const secret = process.env.SESSION_SECRET || 'dev-secret-change-me';
+import './env';
 
 export type Role = 'juli' | 'organizer';
+
+const DEV_SECRET = 'dev-secret-change-me';
+
+// En produccion el secret es obligatorio: sin el, cualquiera podria forjar una sesion de admin.
+const secret = (() => {
+  const s = process.env.SESSION_SECRET;
+  if (process.env.NODE_ENV === 'production' && (!s || s === DEV_SECRET)) {
+    throw new Error('SESSION_SECRET es obligatorio en produccion');
+  }
+  return s || DEV_SECRET;
+})();
+
+export const isSecure = process.env.NODE_ENV === 'production';
 
 export function checkPassword(role: Role, password: string): boolean {
   const envPass = role === 'juli'
