@@ -26,13 +26,19 @@ if (!role) return Astro.redirect('/admin/login');
       </table>
     </div>
 
-    <h2 class="text-xl font-bold text-neon-cyan mt-8 mb-3">Subir foto</h2>
+    <h2 class="text-xl font-bold text-neon-cyan mt-8 mb-3">Canciones de la playlist</h2>
+    <ul id="track-body" class="text-sm space-y-2"></ul>
+
+    <h2 class="text-xl font-bold text-neon-cyan mt-8 mb-3">Fotos</h2>
     <form id="upload-form" class="flex flex-col gap-2 sm:flex-row">
-      <input type="file" name="file" accept="image/*" required class="text-sm" />
-      <input name="alt" placeholder="Alt" class="rounded bg-gray-900 px-3 py-2 border border-gray-700 focus:border-neon-cyan focus:outline-none" />
+      <label for="upload-file" class="sr-only">Foto</label>
+      <input id="upload-file" type="file" name="file" accept="image/*" required class="text-sm" />
+      <label for="upload-alt" class="sr-only">Descripción</label>
+      <input id="upload-alt" name="alt" placeholder="Descripción de la foto" class="flex-1 rounded bg-gray-900 px-3 py-2 border border-gray-700 focus:border-neon-cyan focus:outline-none" />
       <button class="rounded bg-neon-magenta px-4 py-2 text-black font-semibold">Subir</button>
     </form>
-    <p id="upload-status" class="text-sm mt-2" role="status"></p>
+    <p id="upload-status" class="text-sm mt-2" role="status" aria-live="polite"></p>
+    <div id="photo-grid" class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6"></div>
   </section>
 
   <script>
@@ -73,14 +79,75 @@ if (!role) return Astro.redirect('/admin/login');
       window.location.href = '/admin/login';
     });
 
+    // Canciones
+    async function loadTracks() {
+      const r = await fetch('/api/admin/tracks');
+      if (!r.ok) return;
+      const j = await r.json();
+      const ul = document.getElementById('track-body')!;
+      ul.innerHTML = '';
+      if (!j.tracks.length) {
+        ul.innerHTML = '<li class="text-gray-500">Todavia no hay canciones cargadas.</li>';
+        return;
+      }
+      for (const t of j.tracks) {
+        const li = document.createElement('li');
+        li.className = 'flex items-center justify-between gap-3 border-b border-gray-800 py-1';
+        li.innerHTML = `<span>${esc(t.title)} <span class="text-gray-500">— ${esc(t.artist)}</span></span><button data-id="${t.id}" class="del-track text-red-400 hover:text-red-300">borrar</button>`;
+        ul.appendChild(li);
+      }
+      ul.querySelectorAll('.del-track').forEach((b) => {
+        b.addEventListener('click', async () => {
+          const id = (b as HTMLElement).dataset.id;
+          await fetch(`/api/admin/tracks?id=${id}`, { method: 'DELETE' });
+          loadTracks();
+        });
+      });
+    }
+    loadTracks();
+
+    // Fotos
+    async function loadPhotos() {
+      const r = await fetch('/api/admin/photos');
+      if (!r.ok) return;
+      const j = await r.json();
+      const grid = document.getElementById('photo-grid')!;
+      grid.innerHTML = '';
+      for (const p of j.photos) {
+        const card = document.createElement('figure');
+        card.className = 'relative rounded overflow-hidden';
+        card.innerHTML = `<img src="${esc(p.url)}" alt="${esc(p.alt)}" loading="lazy" class="aspect-square w-full object-cover" />
+          <figcaption class="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/70 px-2 py-1 text-xs">
+            <span>❤️ ${p.likes}</span>
+            <button data-id="${p.id}" class="del-photo text-red-400 hover:text-red-300">borrar</button>
+          </figcaption>`;
+        grid.appendChild(card);
+      }
+      grid.querySelectorAll('.del-photo').forEach((b) => {
+        b.addEventListener('click', async () => {
+          const id = (b as HTMLElement).dataset.id;
+          await fetch(`/api/admin/photos?id=${id}`, { method: 'DELETE' });
+          loadPhotos();
+        });
+      });
+    }
+    loadPhotos();
+
     const uploadForm = document.getElementById('upload-form') as HTMLFormElement;
     const uploadStatus = document.getElementById('upload-status')!;
     uploadForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const fd = new FormData(uploadForm);
       const r = await fetch('/api/admin/photos', { method: 'POST', body: fd });
-      if (r.ok) { uploadStatus.textContent = 'Subida OK'; uploadForm.reset(); }
-      else { uploadStatus.textContent = 'Error al subir'; }
+      if (r.ok) {
+        const j = await r.json().catch(() => ({}));
+        uploadStatus.textContent = j.error === 'too large' ? 'La imagen es muy grande (max 12 MB).' : 'Subida OK';
+        uploadForm.reset();
+        loadPhotos();
+      } else {
+        const j = await r.json().catch(() => ({}));
+        uploadStatus.textContent = j.error === 'too large' ? 'La imagen es muy grande (max 12 MB).' : 'Error al subir';
+      }
     });
   </script>
 </Layout>
