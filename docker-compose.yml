@@ -1,19 +1,19 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      args:
+        - NODE_VERSION=22
+    image: juli30:local
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       - NODE_ENV=production
       - HOST=0.0.0.0
       - PORT=3000
       - DATABASE_PATH=/data/db.sqlite
       - UPLOADS_PATH=/data/uploads
-      - ADMIN_JULI_USER=${ADMIN_JULI_USER}
-      - ADMIN_JULI_PASSWORD=${ADMIN_JULI_PASSWORD}
-      - ADMIN_ORGANIZER_USER=${ADMIN_ORGANIZER_USER}
-      - ADMIN_ORGANIZER_PASSWORD=${ADMIN_ORGANIZER_PASSWORD}
-      - SESSION_SECRET=${SESSION_SECRET}
-      - PUBLIC_SITE_URL=${PUBLIC_SITE_URL}
     volumes:
       - juli30_data:/data
     ports:
