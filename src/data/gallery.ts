@@ -12,5 +12,7 @@ export const GALLERY: { file: string; alt: string }[] = [
   { file: '/img/photos/igexport-DeKGYHinI3F-9.webp', alt: 'pareja de Chucky y Tiffany con peto azul y camiseta de rayas' },
   { file: '/img/photos/igexport-DeKGYHinI3F.webp', alt: 'payaso con traje de McDonald’s junto a una bruja en un cementerio de calaveras' },
   { file: '/img/photos/IT-PENNYWISE.webp', alt: 'mujer disfrazada de Pennywise con vestido de payaso y globo rojo' },
+  { file: '/img/photos/juli-logramos-2025.webp', alt: 'Juli sosteniendo un cartel de “Lo logramos 2025” junto a la fuente iluminada' },
+  { file: '/img/photos/julifiesta.webp', alt: 'Juli con saco blanco y short rosa en la fiesta, de noche, entre luces de colores' },
   { file: '/img/photos/WEDNESDAY.webp', alt: 'dos niñas con uniforme de Miércoles Addams sentadas sobre el césped' },
 ];

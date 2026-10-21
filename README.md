@@ -72,6 +72,8 @@ data/            # db.sqlite + uploads (NO versionado)
 
 Fotos nuevas: dejarlas en `src/img/` y correr `npm run photos:prepare`. Imágenes del carrusel: en `src/img/movies/` y `npm run movies:prepare`.
 
+Los dos scripts son **aditivos**: conservan los `.webp` ya generados aunque su original ya no esté en `src/img/`, así que los originales se pueden borrar sin perder nada. Lo que se sirve (`public/img/`) es lo que está versionado en git.
+
 ## Variables de entorno
 
 Copia `.env.example` a `.env` y cambiá las claves.

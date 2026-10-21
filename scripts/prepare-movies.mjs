@@ -2,8 +2,10 @@
 // Convierte las imagenes de src/img/movies a WebP en public/img/movies/ y escribe
 // src/data/movies.ts. Optimizadas al tamano de las cards (360x480). Correr de
 // nuevo cuando cambien las imagenes.
+// Es aditivo: los .webp ya generados se conservan aunque su original ya no este en src/img/movies.
 import sharp from 'sharp';
 import { readdir, mkdir, writeFile } from 'node:fs/promises';
+import { existsSync as exists } from 'node:fs';
 import path from 'node:path';
 
 const SRC = path.resolve('src/img/movies');
@@ -11,7 +13,9 @@ const OUT = path.resolve('public/img/movies');
 const MANIFEST = path.resolve('src/data/movies.ts');
 
 await mkdir(OUT, { recursive: true });
-const files = (await readdir(SRC)).filter((f) => /\.(jpe?g|png|webp)$/i.test(f));
+const files = exists(SRC)
+  ? (await readdir(SRC)).filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
+  : [];
 const entries = [];
 
 for (const file of files) {
@@ -22,6 +26,13 @@ for (const file of files) {
     .webp({ quality: 75 })
     .toFile(path.join(OUT, `${name}.webp`));
   entries.push(`/img/movies/${name}.webp`);
+}
+
+// Conserva las imagenes ya generadas cuyo original ya no este en src/img/movies.
+const generated = (await readdir(OUT)).filter((f) => f.endsWith('.webp'));
+for (const f of generated) {
+  const file = `/img/movies/${f}`;
+  if (!entries.includes(file)) entries.push(file);
 }
 
 entries.sort();

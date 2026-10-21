@@ -1,8 +1,10 @@
 // Uso: node scripts/prepare-photos.mjs
 // Convierte las fotos y fondos de src/img a WebP optimizado en public/img/ y
 // escribe src/data/gallery.ts con el manifiesto. Correr de nuevo cuando cambien.
+// Es aditivo: los .webp ya generados se conservan aunque su original ya no este en src/img.
 import sharp from 'sharp';
 import { readdir, mkdir, writeFile } from 'node:fs/promises';
+import { existsSync as exists } from 'node:fs';
 import path from 'node:path';
 
 const SRC = path.resolve('src/img');
@@ -16,32 +18,38 @@ const BACKGROUNDS = [
   { src: 'fondo-vertical.jpg', out: 'fondo-mobile.webp', size: { height: 1400 } },
 ];
 
+// Alt por nombre de archivo (sin extension, igual al .webp generado).
 const ALT = {
-  'igexport-DeKGYHinI3F.jpg':
+  'igexport-DeKGYHinI3F':
     'payaso con traje de McDonald’s junto a una bruja en un cementerio de calaveras',
-  'igexport-DeKGYHinI3F-2.jpg':
+  'igexport-DeKGYHinI3F-2':
     'pareja de Jack Skellington y Sally en un cementerio de calaveras',
-  'igexport-DeKGYHinI3F-3.jpg': 'payaso a rayas y arlequín multicolor sobre fondo gris',
-  'igexport-DeKGYHinI3F-4.jpg':
+  'igexport-DeKGYHinI3F-3': 'payaso a rayas y arlequín multicolor sobre fondo gris',
+  'igexport-DeKGYHinI3F-4':
     'pareja de Zorro en negro con sombreros y máscaras de zorro',
-  'igexport-DeKGYHinI3F-5.jpg':
+  'igexport-DeKGYHinI3F-5':
     'Doctor Strange con capa roja y Bruja Escarlata con magia en una biblioteca',
-  'igexport-DeKGYHinI3F-6.jpg':
+  'igexport-DeKGYHinI3F-6':
     'vampiro con capa violeta y su pareja de vestido negro sobre fondo oscuro',
-  'igexport-DeKGYHinI3F-7.jpg':
+  'igexport-DeKGYHinI3F-7':
     'payaso terrorífico con globos rojos junto a una chica pelirroja de vestido blanco',
-  'igexport-DeKGYHinI3F-8.jpg': 'pareja de Joker y Harley Quinn con abrigos morados de payaso',
-  'igexport-DeKGYHinI3F-9.jpg': 'pareja de Chucky y Tiffany con peto azul y camiseta de rayas',
-  'igexport-DeKGYHinI3F-10.jpg': 'dos alumnos con uniforme de Hogwarts y varas en una biblioteca',
-  'HARRY-POTTER.jpg': 'chica con capa de Gryffindor y varita mágica en el bosque',
-  'IT-PENNYWISE.jpg': 'mujer disfrazada de Pennywise con vestido de payaso y globo rojo',
-  'WEDNESDAY.jpg': 'dos niñas con uniforme de Miércoles Addams sentadas sobre el césped',
+  'igexport-DeKGYHinI3F-8': 'pareja de Joker y Harley Quinn con abrigos morados de payaso',
+  'igexport-DeKGYHinI3F-9': 'pareja de Chucky y Tiffany con peto azul y camiseta de rayas',
+  'igexport-DeKGYHinI3F-10': 'dos alumnos con uniforme de Hogwarts y varas en una biblioteca',
+  'HARRY-POTTER': 'chica con capa de Gryffindor y varita mágica en el bosque',
+  'IT-PENNYWISE': 'mujer disfrazada de Pennywise con vestido de payaso y globo rojo',
+  'WEDNESDAY': 'dos niñas con uniforme de Miércoles Addams sentadas sobre el césped',
+  julifiesta:
+    'Juli con saco blanco y short rosa en la fiesta, de noche, entre luces de colores',
+  'juli-logramos-2025':
+    'Juli sosteniendo un cartel de “Lo logramos 2025” junto a la fuente iluminada',
 };
 
 await mkdir(OUT, { recursive: true });
 await mkdir(IMG, { recursive: true });
 
 for (const bg of BACKGROUNDS) {
+  if (!exists(path.join(SRC, bg.src))) continue;
   await sharp(path.join(SRC, bg.src))
     .rotate()
     .resize({ ...bg.size, withoutEnlargement: true })
@@ -49,7 +57,9 @@ for (const bg of BACKGROUNDS) {
     .toFile(path.join(IMG, bg.out));
 }
 
-const files = (await readdir(SRC)).filter((f) => /\.(jpe?g|png)$/i.test(f) && !f.startsWith('fondo'));
+const files = exists(SRC)
+  ? (await readdir(SRC)).filter((f) => /\.(jpe?g|png)$/i.test(f) && !f.startsWith('fondo'))
+  : [];
 const entries = [];
 
 for (const file of files) {
@@ -60,15 +70,23 @@ for (const file of files) {
     .resize({ width: 576, height: 576, fit: 'inside', withoutEnlargement: true })
     .webp({ quality: 82 })
     .toFile(out);
-  entries.push({
-    file: `/img/photos/${name}.webp`,
-    alt: ALT[file] ?? `Foto de disfraces: ${name}`,
-  });
+  entries.push({ file: `/img/photos/${name}.webp`, alt: ALT[name] ?? `Foto de disfraces: ${name}` });
+}
+
+// Conserva las fotos ya generadas cuyo original ya no esta en src/img.
+const generated = exists(OUT)
+  ? (await readdir(OUT)).filter((f) => f.endsWith('.webp'))
+  : [];
+for (const f of generated) {
+  const file = `/img/photos/${f}`;
+  if (entries.some((e) => e.file === file)) continue;
+  const name = path.parse(f).name;
+  entries.push({ file, alt: ALT[name] ?? `Foto de disfraces: ${name}` });
 }
 
 entries.sort((a, b) => a.file.localeCompare(b.file));
 if (entries.length === 0) {
-  console.warn('No hay fotos en src/img; no se reescribe gallery.ts.');
+  console.warn('No hay fotos en src/img ni en public/img/photos; no se reescribe gallery.ts.');
   process.exit(0);
 }
 const body = entries
