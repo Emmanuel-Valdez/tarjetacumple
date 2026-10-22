@@ -8,6 +8,13 @@
       "when": 1792523242133,
       "tag": "0000_tiresome_nemesis",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1792632418925,
+      "tag": "0001_contest_voting",
+      "breakpoints": true
     }
   ]
 }
