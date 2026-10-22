@@ -28,6 +28,9 @@ out/
 src/img/
 
 # .NET
+# La regla bin/ tambien excluye el engine binario de .opencode/skills/impeccable
+# (19 MB): solo se usa en local, nunca en el deploy, y el launcher lo descarga
+# solo con verificacion de checksum.
 bin/
 obj/
 *.user

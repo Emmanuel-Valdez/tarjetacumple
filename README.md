@@ -26,6 +26,7 @@ npm run db:migrate       # aplicar migraciones
 npm run photos:prepare   # src/img/*.jpg -> public/img/photos/*.webp + src/data/gallery.ts
 npm run movies:prepare   # src/img/movies/* -> public/img/movies/*.webp + src/data/movies.ts
 npm run db:clean         # borrar datos de prueba (rsvps, likes, tracks, fotos subidas)
+npm run db:backup        # backup online del SQLite (incluye el WAL) a data/backups/
 ```
 
 Dev server en background (según AGENTS.md):
@@ -103,14 +104,18 @@ Copia `.env.example` a `.env` y cambiá las claves.
 | `/api/admin/login` `/logout` | POST | sesión del admin |
 | `/api/admin/rsvps` | GET / DELETE | listar y borrar RSVPs (oculta dedicatorias para Juli) |
 | `/api/admin/tracks` | GET / DELETE | listar y borrar canciones |
-| `/api/admin/photos` | GET / POST / DELETE | listar, subir (reescalada a WebP) y borrar fotos |
+| `/api/admin/photos` | GET / POST / DELETE | listar, subir (con destino `kind`) y borrar fotos (409 para las del repo o con votos) |
+| `/api/contest` | GET | estado del concurso, categorías pendientes (orden aleatorio) y ganadores al cerrar |
+| `/api/contest/vote` | POST | votar una foto candidata en una categoría (1 por visitante) |
+| `/api/admin/contest` | GET / POST | tally por categoría / abrir, cerrar y reiniciar el concurso |
 
 ## Imágenes
 
 - Las fotos del repo (`src/img/`) se convierten a **WebP** (`public/img/photos/`, máx. 576 px, q82) y los fondos a `public/img/fondo-desktop.webp` (1600 px) y `fondo-mobile.webp` (1200 px). Se registran solas en la DB al arrancar (seed idempotente en `src/db/index.ts`).
 - El carrusel de películas usa `src/img/movies/` → `public/img/movies/` (360×480, q75) vía `npm run movies:prepare`.
-- Las subidas desde `/admin` pasan por **sharp**: se reescalan a 1600 px y se guardan como WebP en el volumen `UPLOADS_PATH` (tope 12 MB de entrada). Se pueden subir todas las que quieras, no hay límite de cantidad.
-- La galería es un carrusel horizontal con scroll infinito (3 copias de la pista, sin botones) y like por cookie anónima.
+- Las subidas desde `/admin` pasan por **sharp**: `rotate()` + resize a **1440 px** de lado mayor (sin agrandar) + WebP q80, con nombre **UUID** (nunca sobreescribe) en el volumen `UPLOADS_PATH` (tope 12 MB de entrada). Se guarda una sola versión; el original no se conserva. Se pueden subir todas las que quieras.
+- Las fotos se muestran en **tiras (grillas) entre las secciones** de texto, no en carrusel. Cada foto tiene el like por cookie anónima. Las fotos de destino **Concurso** quedan fuera de las tiras mientras el concurso está abierto.
+- **Backup**: `npm run db:backup` (o `docker compose exec app node ./scripts/backup-db.mjs` en prod) escribe un backup consistente en `data/backups/db-<timestamp>.sqlite`.
 
 ## Deploy
 

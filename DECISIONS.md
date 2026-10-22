@@ -199,4 +199,19 @@ Referencias (20):
 - **`.env` local**: se deja como está. En producción las claves reales ya funcionan.
 - **Pendientes** (con paso a paso en `PROJECT_CONTEXT.local.md`): ID del playlist real de Spotify (hoy el embed apunta al "Today's Top Hits" genérico) y el pase de QA desde el celular.
 
+## Ronda 8 — contest-voting (concurso de premios por voto)
+
+- **Una sola versión por foto, inmutable**: sharp hace `rotate()` + `resize(1440px lado mayor, sin agrandar)` + `webp(q80)` y se guarda **solo** ese archivo con nombre UUID en `UPLOADS_PATH`. No se guarda el original (antes 1600 px q82). El recorte lo hace el CSS (`object-cover` en card 3:4), no el guardado: un recorte malo sería irreversible.
+- **`photos.kind`** (`backstage` | `contest`, default `backstage`): el admin elige destino al subir. Las del repo son `backstage`. Una tabla de álbumes sería un JOIN para guardar dos strings.
+- **Borrado sin ambigüedad**: las fotos del repo (`filename` empieza con `/`) dan **409** (viven en la imagen Docker, se borran del código); las subidas con votos en `contest_votes` también **409**; solo se borra (fila + archivo) una subida sin votos. El seed dejó de resucitar filas: solo INSERT de las fotos del repo que falten, nunca toca subidas.
+- **Concurso = máquina de 3 estados** en la tabla `contest` (fila única `id=1`): `idle` → `open` → `closed`. Abrir **congela** las categorías de `src/data/awards.ts` en `contest_categories` (slug/título/emoji/teaser/posición); cerrar calcula y **congela** el ganador por categoría (`winner_photo_id`, `winner_votes`). **Cerrar es definitivo**: reabrir da 409.
+- **Reset para ensayar**: `POST /api/admin/contest {action:'reset', confirm:'reiniciar'}` borra votos y ganadores, vacía categorías y vuelve a `idle`. Sin la palabra exacta → 400. Las fotos candidatas no se tocan. La UI pide escribir "reiniciar" y avisa que no se use en la fiesta.
+- **Un voto por categoría por visitante**: `UNIQUE(category_id, visitor_id)` en la base (no check-then-insert), con la cookie `visitor_id` que ya usa el corazón. Limitación aceptada: cambiar de dispositivo/cookies permite votar de nuevo.
+- **Sin tally durante la votación** (evita bandwagon): `GET /api/contest` solo devuelve ganadores cuando está `closed`; el admin sí ve el tally en `GET /api/admin/contest`. Orden de categorías pendientes **aleatorio**.
+- **Candidatos fuera de las tiras mientras el concurso está `open`**: `GET /api/photos` filtra por destino y estado, así no se descargan 50 fotos que nadie mira y no circulan antes de tiempo.
+- **"El backstage" deja de ser carrusel**: se eliminan `.gallery-track/.gallery-pista/.gallery-item` y el JS de scroll infinito. Las fotos van en **4 tiras** en grilla entre las secciones de texto, con reparto determinista por índice (`i % 4`) para que subir una foto no mueva las demás.
+- **Suspenso del lado cliente**: la página hace polling cada 2 s mientras está `open`; al ver `closed` corre la animación de 4 s y recién pinta los ganadores. `prefers-reduced-motion` los muestra sin animación. Los ganadores se leen de `contest_categories`, no del listado de fotos.
+- **Backup online**: `scripts/backup-db.mjs` usa `db.backup()` de better-sqlite3 (copia consistente que incluye el WAL) a `<dir de la DB>/backups/db-<timestamp>.sqlite` (`npm run db:backup`). El `Dockerfile` copia `scripts/` para correrlo dentro del contenedor.
+- **Operativa**: todo se maneja desde `/admin` la noche del evento; el change se deploya **antes** (la lista de premios se edita en `src/data/awards.ts` con deploy previo). Sin dependencias nuevas.
+
 
