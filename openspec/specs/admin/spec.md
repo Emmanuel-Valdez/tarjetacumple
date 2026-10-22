@@ -1,6 +1,6 @@
 ## Purpose
 
-Admin panel with dual authentication for managing RSVPs, photos, likes and dedications.
+Admin panel with dual authentication for managing RSVPs, photos and dedications.
 
 ## Requirements
 
@@ -34,11 +34,11 @@ The system SHALL let admins copy or export the RSVP list.
 - **THEN** the RSVP list is copied to the clipboard
 
 ### Requirement: Photo upload
-The system SHALL let admins upload photos with validation of type and size, and SHALL let them choose whether the photo is a strip photo or a contest candidate.
+The system SHALL let admins upload photos with validation of type and size as contest candidates only; it SHALL NOT offer a strip-photo destination.
 
 #### Scenario: Valid upload
 - **WHEN** an admin uploads a valid image
-- **THEN** it is stored and appears in the photo strips
+- **THEN** it is stored as a contest candidate and is available to the contest
 
 #### Scenario: Invalid upload rejected
 - **WHEN** an admin uploads an invalid file
@@ -48,9 +48,13 @@ The system SHALL let admins upload photos with validation of type and size, and 
 - **WHEN** an admin uploads an image larger than 1440px
 - **THEN** it is resized and converted to WebP before being stored
 
+#### Scenario: Only contest candidates are managed
+- **WHEN** an admin views or uploads photos
+- **THEN** the photo list and upload action manage contest candidates only and provide no strip destination
+
 #### Scenario: Destination is recorded
 - **WHEN** an admin uploads a photo as a contest candidate
-- **THEN** the photo is recorded as a candidate and does not appear in the photo strips while the contest is open
+- **THEN** the photo is recorded as a candidate and is available only to the contest flow, not to public strips
 
 ### Requirement: Song management
 The system SHALL let admins list and delete the songs guests added to the playlist.
@@ -71,23 +75,31 @@ The system SHALL show dedications only to the organizer, not to Juli.
 - **THEN** dedications are hidden
 
 ### Requirement: Contest controls
-The system SHALL let admins open and close the award contest from the admin panel.
+The system SHALL let Juli and the organizer open and close the award contest from their authenticated admin panel sessions.
+
+#### Scenario: Juli opens the contest
+- **WHEN** Juli opens the contest
+- **THEN** voting is enabled for visitors and the award categories are frozen
+
+#### Scenario: Organizer opens the contest
+- **WHEN** the organizer opens the contest
+- **THEN** voting is enabled for visitors and the award categories are frozen
 
 #### Scenario: Open the contest
-- **WHEN** an admin opens the contest
+- **WHEN** either admin role opens the contest
 - **THEN** voting is enabled for visitors and the award categories are frozen
 
 #### Scenario: Close the contest
-- **WHEN** an admin closes the contest
+- **WHEN** either admin role closes the contest
 - **THEN** voting is disabled and the winners are calculated and frozen
 
 #### Scenario: Closed contest cannot be reopened
-- **WHEN** an admin tries to open a contest that was already closed
+- **WHEN** either role tries to open a contest that was already closed
 - **THEN** the request is rejected and the winners stay frozen
 
 #### Scenario: Closing asks for confirmation
-- **WHEN** an admin triggers the close action
-- **THEN** a confirmation is shown explaining that the contest cannot be reopened, and the contest stays open until the admin confirms
+- **WHEN** either role triggers the close action
+- **THEN** a confirmation is shown explaining that the contest cannot be reopened, and the contest stays open until confirmed
 
 ### Requirement: Contest reset
 The system SHALL let admins reset the contest from the admin panel, discarding the votes and the winners, so the flow can be rehearsed before the event.
@@ -114,3 +126,14 @@ The system SHALL let admins see, per category, how many votes each candidate pho
 #### Scenario: Tally is current
 - **WHEN** the admin reloads the contest panel while the contest is open
 - **THEN** the vote counts reflect the votes cast so far
+
+### Requirement: Return to the invitation
+The system SHALL provide a visible “Volver a la invitación” link from both the admin panel and the admin login page.
+
+#### Scenario: Return from admin panel
+- **WHEN** an authenticated admin is in the admin panel
+- **THEN** they can navigate to the public invitation
+
+#### Scenario: Return from login
+- **WHEN** a visitor is on the admin login page
+- **THEN** they can navigate to the public invitation without logging in

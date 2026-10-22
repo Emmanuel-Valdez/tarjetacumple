@@ -4,7 +4,6 @@ import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import * as schema from './schema';
 import { mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { GALLERY } from '../data/gallery';
 import '../lib/env';
 
 const dbPath = process.env.DATABASE_PATH || './data/db.sqlite';
@@ -18,18 +17,3 @@ export const db = drizzle(sqlite, { schema });
 export { sqlite };
 
 migrate(db, { migrationsFolder: join(process.cwd(), 'drizzle') });
-
-// Seed idempotente: registra las fotos estaticas de public/img/photos (servidas por Astro).
-// Solo inserta las que faltan; no borra ni actualiza filas y nunca toca fotos subidas.
-try {
-  const existing = new Set(
-    db.select({ f: schema.photos.filename }).from(schema.photos).all().map((r) => r.f),
-  );
-  GALLERY.forEach((g, i) => {
-    if (!existing.has(g.file)) {
-      db.insert(schema.photos)
-        .values({ filename: g.file, alt: g.alt, kind: 'backstage', sortOrder: i })
-        .run();
-    }
-  });
-} catch {}

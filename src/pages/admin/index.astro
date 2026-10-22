@@ -10,7 +10,10 @@ if (!role) return Astro.redirect('/admin/login');
   <section class="mx-auto max-w-5xl px-4 py-8">
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold text-neon-magenta">Panel admin · {role}</h1>
-      <button id="logout" class="text-sm text-gray-400 hover:text-white">Salir</button>
+      <div class="flex items-center gap-4">
+        <a href="/" class="text-sm text-neon-cyan hover:underline focus:outline-none focus:ring-2 focus:ring-neon-magenta">Volver a la invitación</a>
+        <button id="logout" class="text-sm text-gray-400 hover:text-white">Salir</button>
+      </div>
     </div>
 
     <h2 class="text-xl font-bold text-neon-cyan mb-3">RSVPs</h2>
@@ -35,11 +38,6 @@ if (!role) return Astro.redirect('/admin/login');
       <input id="upload-file" type="file" name="file" accept="image/*" required class="text-sm" />
       <label for="upload-alt" class="sr-only">Descripción</label>
       <input id="upload-alt" name="alt" placeholder="Descripción de la foto" class="flex-1 rounded bg-gray-900 px-3 py-2 border border-gray-700 focus:border-neon-cyan focus:outline-none" />
-      <label for="upload-kind" class="sr-only">Destino</label>
-      <select id="upload-kind" name="kind" class="rounded bg-gray-900 px-3 py-2 border border-gray-700 focus:border-neon-cyan focus:outline-none">
-        <option value="backstage">Tiras</option>
-        <option value="contest">Concurso</option>
-      </select>
       <button class="rounded bg-neon-magenta px-4 py-2 text-black font-semibold">Subir</button>
     </form>
     <p id="upload-status" class="text-sm mt-2" role="status" aria-live="polite"></p>
@@ -145,8 +143,7 @@ if (!role) return Astro.redirect('/admin/login');
         card.className = 'relative rounded overflow-hidden';
         card.innerHTML = `<img src="${esc(p.url)}" alt="${esc(p.alt)}" loading="lazy" class="aspect-square w-full object-cover" />
           <figcaption class="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-black/70 px-2 py-1 text-xs">
-            <span>${p.kind === 'contest' ? 'Concurso' : 'Tiras'}</span>
-            <span>❤️ ${p.likes}</span>
+            <span>Concurso</span>
             <button data-id="${p.id}" class="del-photo text-red-400 hover:text-red-300">borrar</button>
           </figcaption>`;
         grid.appendChild(card);

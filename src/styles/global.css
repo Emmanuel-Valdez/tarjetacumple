@@ -54,6 +54,20 @@
   pointer-events: none;
 }
 
+/* Marquesina del hero: el texto cruza la pantalla de lado a lado. */
+.marquee { overflow: hidden; white-space: nowrap; }
+.marquee > span {
+  display: inline-block;
+  animation: marquee 12s linear infinite;
+}
+@keyframes marquee {
+  from { transform: translateX(100%); }
+  to { transform: translateX(-100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee > span { animation: none; transform: none; }
+}
+
 /* Carrusel de peliculas: filas automaticas en sentidos opuestos. */
 .movie-card {
   flex: none;

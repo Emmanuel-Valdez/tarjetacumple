@@ -6,32 +6,32 @@ Night-time award contest where guests vote from their own phones for the best co
 ## Requirements
 
 ### Requirement: Contest starts idle
-The system SHALL keep the contest closed until an admin opens it, and SHALL show visitors a neutral message instead of the voting controls.
+The system SHALL keep the contest closed until Juli or the organizer opens it, hide the public vote button while it is idle, and show no candidates or voting controls on direct visits to `/votar`.
 
 #### Scenario: Before the contest is opened
-- **WHEN** a visitor opens the voting section before an admin opens the contest
-- **THEN** no voting controls are shown and the section states that voting is not open
+- **WHEN** a visitor opens the landing page or `/votar` before voting opens
+- **THEN** no public vote button, candidate photos or voting controls are shown, and the vote view states that voting is unavailable
 
 ### Requirement: Organizer opens the contest
-The system SHALL let an admin open the award contest from the admin panel, freezing the list of award categories at that moment.
+The system SHALL let Juli or the organizer open the award contest from the admin panel, freezing the list of award categories at that moment and making the public `/votar` view available.
 
 #### Scenario: Opening enables voting
-- **WHEN** an admin opens the contest
-- **THEN** the voting section becomes available to visitors
+- **WHEN** Juli or the organizer opens the contest
+- **THEN** the landing page exposes the vote button and visitors can vote in `/votar`
 
 #### Scenario: Categories are frozen
-- **WHEN** an admin opens the contest
-- **THEN** the categories of that contest are the award categories declared at that moment and do not change afterwards
+- **WHEN** the contest is opened
+- **THEN** its categories are the ten award categories declared at that moment and do not change afterwards
 
 #### Scenario: Opening twice keeps the frozen list
 - **WHEN** an admin opens a contest that is already open
 - **THEN** the previously frozen categories are kept unchanged
 
 ### Requirement: Visitor votes for a category
-The system SHALL let a visitor vote for one photo per category from their own device, identified by the anonymous visitor cookie that already powers the like counters.
+The system SHALL let a visitor vote for one photo per category on the separate same-site `/votar` view, from their own device identified by the anonymous visitor cookie.
 
 #### Scenario: Voting for a photo
-- **WHEN** a visitor selects a candidate photo for the category shown and confirms
+- **WHEN** a visitor selects a candidate photo for the category shown on `/votar` and confirms
 - **THEN** the vote is recorded and the visitor moves to the next pending category
 
 #### Scenario: One vote per category
@@ -43,12 +43,12 @@ The system SHALL let a visitor vote for one photo per category from their own de
 - **THEN** the vote is rejected
 
 #### Scenario: Voting rejected while the contest is closed
-- **WHEN** a visitor tries to vote after the contest was closed
+- **WHEN** a visitor tries to vote before the contest opens or after it closes
 - **THEN** the vote is rejected and no vote is recorded
 
 #### Scenario: Vote is tied to the visitor cookie
-- **WHEN** a visitor votes from a device
-- **THEN** the vote is counted for the visitor identified by the anonymous cookie, and the same visitor cannot vote twice in the same category
+- **WHEN** a visitor votes from the landing page and then continues on `/votar`
+- **THEN** the same visitor identity is used and the visitor cannot vote twice in the same category
 
 ### Requirement: Categories are presented in random order
 The system SHALL present the pending categories to each visitor in a random order, so the same category is not always voted first.
@@ -65,11 +65,11 @@ The system SHALL NOT show the per-photo vote tally to visitors while the contest
 - **THEN** no vote count is displayed for any candidate
 
 ### Requirement: Organizer closes the contest
-The system SHALL let an admin close the contest, which stops all voting and freezes the winner of each category.
+The system SHALL let Juli or the organizer close the contest, which stops all voting and freezes the winner of each category.
 
 #### Scenario: Closing stops voting
-- **WHEN** an admin closes the contest
-- **THEN** the voting section no longer accepts votes and the voting controls disappear
+- **WHEN** Juli or the organizer closes the contest
+- **THEN** `/votar` no longer accepts votes and the public vote button disappears from the landing page
 
 #### Scenario: Winners are frozen
 - **WHEN** an admin closes the contest
@@ -120,13 +120,17 @@ The system SHALL reveal the winners a few seconds after the contest is closed, s
 - **WHEN** the visitor prefers reduced motion
 - **THEN** the winners are revealed without the suspense animation
 
-### Requirement: Contest photos stay out of the public strips until the contest ends
-The system SHALL NOT include the contest candidate photos in the public photo strips while the contest is open, and SHALL include them once the contest is closed.
+### Requirement: Candidate photos are isolated to the voting view
+The system SHALL load contest candidate photos only in the public `/votar` view while voting is open; the landing page SHALL NOT render the candidate-photo collection.
 
-#### Scenario: Candidates hidden during the contest
-- **WHEN** the contest is open and a visitor browses the photo strips
-- **THEN** no contest candidate photo is included in them
+#### Scenario: Candidates are not loaded on the landing page
+- **WHEN** a visitor loads the landing page while the contest is open
+- **THEN** the page shows the vote button but does not load the candidate-photo collection
 
-#### Scenario: Candidates visible after the contest
-- **WHEN** a visitor browses the photo strips after the contest was closed
-- **THEN** the contest candidate photos are included
+#### Scenario: Candidate photos appear in the voting view
+- **WHEN** a visitor opens `/votar` while voting is open
+- **THEN** candidate photos are available for the current category without displaying vote totals
+
+#### Scenario: Closed view does not expose candidates
+- **WHEN** a visitor opens `/votar` while the contest is idle or closed
+- **THEN** candidate photos and voting controls are not returned for public display

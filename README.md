@@ -48,8 +48,9 @@ src/
   lib/           # auth.ts (sesiones), visitor.ts (cookie anonima), images.ts (sharp), env.ts
   pages/
     index.astro  # landing
+    votar.astro  # vista de votación del concurso
     admin/       # panel (login + RSvps + canciones + fotos)
-    api/         # endpoints: rsvp, likes, tracks, photos, admin/*
+    api/         # endpoints: rsvp, tracks, photos, contest, admin/*
 public/
   img/           # TODAS las imagenes servidas (versionado en git)
     fondo-desktop.webp   # fondo horizontal (landscape)
@@ -67,7 +68,7 @@ data/            # db.sqlite + uploads (NO versionado)
 | Archivo | Qué define |
 |---|---|
 | `src/data/event.ts` | fecha, hora, lugar, dirección, link de Maps, playlist de Spotify |
-| `src/data/awards.ts` | premios "Oscar"; las categorías se muestran siempre visibles |
+| `src/data/awards.ts` | premios "Oscar"; antes de abrir el concurso se muestran 2 categorías de adelanto y al abrirlo las 10 |
 | `src/data/gallery.ts` | **generado** por `npm run photos:prepare` — no editar a mano |
 | `src/data/movies.ts` | **generado** por `npm run movies:prepare` — carrusel de películas |
 
@@ -98,23 +99,22 @@ Copia `.env.example` a `.env` y cambiá las claves.
 |---|---|---|
 | `/api/rsvp` | GET / POST | contador de personas confirmadas / crear RSVP |
 | `/api/tracks` | GET / POST | canciones de la playlist (agrega cualquier invitado) |
-| `/api/photos` | GET | galería + likes del visitante (cookie `visitor_id`) |
-| `/api/likes` | POST | like (1 por visitante y foto) |
+| `/api/photos` | GET | fotos candidatas del concurso |
 | `/api/photos/[id]/file` | GET | sirve fotos subidas desde el volumen |
 | `/api/admin/login` `/logout` | POST | sesión del admin |
 | `/api/admin/rsvps` | GET / DELETE | listar y borrar RSVPs (oculta dedicatorias para Juli) |
 | `/api/admin/tracks` | GET / DELETE | listar y borrar canciones |
-| `/api/admin/photos` | GET / POST / DELETE | listar, subir (con destino `kind`) y borrar fotos (409 para las del repo o con votos) |
+| `/api/admin/photos` | GET / POST / DELETE | listar, subir y borrar fotos candidatas del concurso (409 para las del repo o con votos) |
 | `/api/contest` | GET | estado del concurso, categorías pendientes (orden aleatorio) y ganadores al cerrar |
 | `/api/contest/vote` | POST | votar una foto candidata en una categoría (1 por visitante) |
 | `/api/admin/contest` | GET / POST | tally por categoría / abrir, cerrar y reiniciar el concurso |
 
 ## Imágenes
 
-- Las fotos del repo (`src/img/`) se convierten a **WebP** (`public/img/photos/`, máx. 576 px, q82) y los fondos a `public/img/fondo-desktop.webp` (1600 px) y `fondo-mobile.webp` (1200 px). Se registran solas en la DB al arrancar (seed idempotente en `src/db/index.ts`).
+- Las fotos del repo (`src/img/`) se convierten a **WebP** (`public/img/photos/`, máx. 576 px, q82) y los fondos a `public/img/fondo-desktop.webp` (1600 px) y `fondo-mobile.webp` (1200 px). Las fotos destacadas de Juli (julifiesta, julilogramos) se sirven directo desde `public/`.
 - El carrusel de películas usa `src/img/movies/` → `public/img/movies/` (360×480, q75) vía `npm run movies:prepare`.
 - Las subidas desde `/admin` pasan por **sharp**: `rotate()` + resize a **1440 px** de lado mayor (sin agrandar) + WebP q80, con nombre **UUID** (nunca sobreescribe) en el volumen `UPLOADS_PATH` (tope 12 MB de entrada). Se guarda una sola versión; el original no se conserva. Se pueden subir todas las que quieras.
-- Las fotos se muestran en **tiras (grillas) entre las secciones** de texto, no en carrusel. Cada foto tiene el like por cookie anónima. Las fotos de destino **Concurso** quedan fuera de las tiras mientras el concurso está abierto.
+- Las fotos candidatas del concurso se votan en la vista `/votar`; no se muestran en la landing.
 - **Backup**: `npm run db:backup` (o `docker compose exec app node ./scripts/backup-db.mjs` en prod) escribe un backup consistente en `data/backups/db-<timestamp>.sqlite`.
 
 ## Deploy

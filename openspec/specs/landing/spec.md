@@ -5,11 +5,11 @@ Landing page for Juli's 30th birthday invitation, themed as a night at the cinem
 ## Requirements
 
 ### Requirement: Hero section
-The system SHALL display a hero section with the birthday person's name, the tagline "Juli: tener 30, ser coqueta y prospera" and a countdown to the event date.
+The system SHALL display a hero section with Juli's name, the heading “Juli protagoniza:”, the marquee text “legalmente 30” and a countdown to the event date.
 
 #### Scenario: Hero renders
 - **WHEN** a visitor loads the page
-- **THEN** the hero shows "Juli", the tagline "Juli: tener 30, ser coqueta y prospera" and an inviting phrase
+- **THEN** the hero shows Juli, “Juli protagoniza:”, “legalmente 30” as an inviting marquee, and an invitation to join the celebration
 
 #### Scenario: Countdown present
 - **WHEN** the page loads before the event date
@@ -59,23 +59,39 @@ The system SHALL show a single background image, sharp on entry, and SHALL blur 
 - **THEN** the background switches between sharp and blurred without a transition
 
 ### Requirement: Awards teaser
-The system SHALL list the award categories visibly on the page, without instructions addressed to the organizer, and SHALL show the winner of the category in its card once the winners have been revealed.
+The system SHALL show only two preview categories and the message “y varias categorías más” before voting opens, reveal the complete list of ten categories when voting opens, and SHALL show each winner in its category card after the winners have been revealed.
+
+#### Scenario: Preview before voting opens
+- **WHEN** a visitor views the awards section while the contest is idle
+- **THEN** only “Mejor Disfraz Masculino” and “Mejor Disfraz Femenino” are shown, followed by “y varias categorías más”
 
 #### Scenario: Categories visible
 - **WHEN** a visitor views the awards section
-- **THEN** each award category is displayed with its title
+- **THEN** the two preview categories are visible before voting opens and all ten categories are visible once voting opens
+
+#### Scenario: Full categories revealed when voting opens
+- **WHEN** an organizer or Juli opens voting
+- **THEN** the awards section shows all ten categories and the public vote button
 
 #### Scenario: No organizer instructions
 - **WHEN** the awards section is rendered
-- **THEN** it contains no text instructing the reader to organize a contest or hand out statuettes
+- **THEN** it contains no text instructing visitors to organize the contest or hand out prizes
+
+#### Scenario: Final categories
+- **WHEN** the complete award list is shown
+- **THEN** its categories are “Mejor Disfraz Masculino”, “Mejor Disfraz Femenino”, “Mejor Disfraz de Pareja o Grupo”, “Premio a la Nostalgia Milenial”, “Premio a la Mejor Frase Icónica”, “Premio ‘No Entendí Quién Eras’”, “Premio Éxito de Taquilla”, “Mejor Presupuesto Mínimo”, “Alma de la Fiesta” and “Mejor Paso Prohibido”
+
+#### Scenario: Category descriptions
+- **WHEN** the complete award list is shown
+- **THEN** the new categories describe iconic character lines, mysterious or hard-to-guess costumes, costumes that attract photo requests, ingenious low-budget costumes, guests who energize the party and the most ridiculous but fun dance
+
+#### Scenario: No winner before the reveal
+- **WHEN** the contest has not been closed and its winners revealed
+- **THEN** category cards show no winner
 
 #### Scenario: Winner shown in the card
 - **WHEN** the winners have been revealed
-- **THEN** the card of each category shows the winning photo
-
-#### Scenario: No winner before the reveal
-- **WHEN** the contest was not closed yet
-- **THEN** the category cards show no winner
+- **THEN** each category card shows its winning photo when a winner exists
 
 ### Requirement: Event data is centralized
 The system SHALL read the date, time, venue, address and map link from a single data module.
@@ -87,13 +103,6 @@ The system SHALL read the date, time, venue, address and map link from a single 
 #### Scenario: Real schedule is displayed
 - **WHEN** a visitor views the location section
 - **THEN** it shows the date, time and timezone declared in the event data module
-
-### Requirement: Dress code section
-The system SHALL display a dress code with a playful message encouraging costumes.
-
-#### Scenario: Dress code shown
-- **WHEN** a visitor views the dress code section
-- **THEN** a playful message about wearing a costume is displayed
 
 ### Requirement: Movie inspiration carousel
 The system SHALL replace the costume ideas grid with two auto-scrolling rows of movie/series images. Each row SHALL show a different half of the image set, loop seamlessly, and move slowly enough to read.
@@ -110,27 +119,42 @@ The system SHALL replace the costume ideas grid with two auto-scrolling rows of 
 - **WHEN** the visitor prefers reduced motion
 - **THEN** the rows stay static
 
-### Requirement: Adults only notice
-The system SHALL display a notice stating that the party is for adults only, phrased in a playful way that matches the costume theme.
+### Requirement: Event details grouped as compact cards
+The system SHALL present dress code, adults-only guidance and what guests should bring together under “Qué hay que traer” as compact cards with clear copy addressed to adult invitees.
 
-#### Scenario: Notice visible
-- **WHEN** a visitor views the page
-- **THEN** a section states that the party is only for adults and that minors are not admitted
+#### Scenario: Required costume and special awards
+- **WHEN** a visitor views “Qué hay que traer”
+- **THEN** a card states that a costume is mandatory and that special prizes will be awarded during the night
 
-#### Scenario: Tone matches the theme
-- **WHEN** the notice is displayed
-- **THEN** it is written playfully with costume references rather than as a formal policy statement
+#### Scenario: Adults-only guidance addresses invitees
+- **WHEN** a visitor views “Qué hay que traer”
+- **THEN** a card clearly states that the invitation is for adults and asks guests not to bring children, without addressing minors directly
 
-### Requirement: What to bring section
-The system SHALL display a section presenting the guests' contribution as their presence plus the alcoholic drinks they plan to bring.
+#### Scenario: Presence and drinks
+- **WHEN** a visitor views “Qué hay que traer”
+- **THEN** cards state that their presence is welcome and that each guest should bring their own alcoholic drink
 
-#### Scenario: Section visible
-- **WHEN** a visitor views the page
-- **THEN** a section lists two items: their presence and the drinks they will bring
+### Requirement: Featured Juli photos and commitment message
+The system SHALL show the julifiesta photo directly below the location section as a single prominent image, and SHALL show the julilogramos photo with an inviting commitment message before the playlist.
 
-#### Scenario: Drinks are explicitly alcoholic
-- **WHEN** the section is displayed
-- **THEN** it states that guests bring their own alcoholic drinks
+#### Scenario: Juli fiesta photo placement
+- **WHEN** a visitor scrolls below the location section
+- **THEN** they see one prominent julifiesta image instead of interleaved photo grids
+
+#### Scenario: Julilogramos before the playlist
+- **WHEN** a visitor reaches the playlist area
+- **THEN** the “Te espero, no me falles” message and julilogramos photo appear before the playlist
+
+### Requirement: Gift transfer information
+The system SHALL show a “Regalos” section with a placeholder for transfer information until real details are configured, and SHALL display configured transfer details from server-side environment configuration when available.
+
+#### Scenario: Placeholder while transfer details are not configured
+- **WHEN** a visitor views “Regalos” and transfer information is not configured
+- **THEN** a clear placeholder is shown instead of invented recipient or account information
+
+#### Scenario: Configured transfer details
+- **WHEN** transfer information is configured on the server
+- **THEN** “Regalos” displays the configured alias and recipient/account details
 
 ### Requirement: Page title and favicon
 The system SHALL use "Juli: capitulo 30, la pelicula" as the browser tab title and a Michael Jackson zombie themed icon as the favicon.
@@ -173,22 +197,30 @@ The system SHALL show a few static balloons and confetti that move upward only a
 - **THEN** the decoration stays static
 
 ### Requirement: Access to the contest
-The system SHALL provide a button in the awards section that takes the visitor to the contest section.
+The system SHALL provide a link from the awards section to the separate `/votar` view only while voting is open.
+
+#### Scenario: No link before voting opens
+- **WHEN** a visitor views the awards section while the contest is idle
+- **THEN** no link or button to vote is displayed
 
 #### Scenario: Button is visible
-- **WHEN** a visitor views the awards section
-- **THEN** a button to go to the voting section is displayed
+- **WHEN** an organizer or Juli has opened voting
+- **THEN** the awards section displays a button that opens `/votar`
 
 #### Scenario: Button navigates
-- **WHEN** the visitor activates the button
-- **THEN** the contest section is shown
+- **WHEN** a visitor activates the vote button while voting is open
+- **THEN** the `/votar` view is opened
 
-### Requirement: Voting section
-The system SHALL display a voting section that shows the category to be voted, the candidate photos and a confirmation control, and that guides the visitor through one category after another.
+#### Scenario: Link disappears after voting closes
+- **WHEN** the contest is closed
+- **THEN** the public vote button is no longer displayed and the awards section can reveal the winners
+
+### Requirement: Voting view
+The system SHALL keep the voting flow on the separate `/votar` view and guide each visitor through one pending category at a time.
 
 #### Scenario: Category and candidates shown
-- **WHEN** the contest is open and the visitor opens the voting section
-- **THEN** the pending category is shown with its candidates and no vote count
+- **WHEN** the contest is open and a visitor opens `/votar`
+- **THEN** the pending category is shown with its candidate photos and no vote counts
 
 #### Scenario: Confirmation is required
 - **WHEN** the visitor has not selected a candidate
@@ -200,11 +232,11 @@ The system SHALL display a voting section that shows the category to be voted, t
 
 #### Scenario: All categories voted
 - **WHEN** the visitor has voted in every category
-- **THEN** the section states that all the votes are complete
+- **THEN** the view states that all votes are complete
 
-#### Scenario: Voting is not open
-- **WHEN** the contest was not opened yet
-- **THEN** the voting controls are not shown and the section states that voting is not open
+#### Scenario: Direct access while voting is unavailable
+- **WHEN** a visitor opens `/votar` before voting opens or after it closes
+- **THEN** no candidate photos or voting controls are shown and the view explains that voting is unavailable
 
 ### Requirement: Suspense before the winners are shown
 The system SHALL hold back the winners for a few seconds after the contest is closed and then show them, so the announcement builds suspense on the page.

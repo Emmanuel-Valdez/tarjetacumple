@@ -8,10 +8,6 @@ import { writeFile, unlink } from 'node:fs/promises';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { eq, sql } from 'drizzle-orm';
-import { likes } from '../../../db/schema';
-import { z } from 'zod';
-
-const kindSchema = z.enum(['backstage', 'contest']);
 
 function roleFromRequest(request: Request) {
   const match = request.headers.get('cookie')?.match(/(?:^|;\s*)admin_session=([^;]+)/);
@@ -21,20 +17,17 @@ function roleFromRequest(request: Request) {
 export const GET: APIRoute = async ({ request }) => {
   const role = roleFromRequest(request);
   if (!role) return Response.json({ error: 'unauthorized' }, { status: 401 });
-  const rows = await db.select().from(photos).orderBy(photos.sortOrder, photos.id);
-  const counts = await db
-    .select({ photoId: likes.photoId, count: sql<number>`count(*)` })
-    .from(likes)
-    .groupBy(likes.photoId);
-  const map = new Map(counts.map((c) => [c.photoId, c.count]));
+  const rows = await db
+    .select()
+    .from(photos)
+    .where(eq(photos.kind, 'contest'))
+    .orderBy(photos.sortOrder, photos.id);
   return Response.json({
     photos: rows.map((p) => ({
       id: p.id,
       url: p.filename.startsWith('/') ? p.filename : `/api/photos/${p.id}/file`,
       alt: p.alt,
       filename: p.filename,
-      kind: p.kind,
-      likes: map.get(p.id) ?? 0,
     })),
   });
 };
@@ -61,13 +54,11 @@ export const POST: APIRoute = async ({ request }) => {
   await writeFile(path.join(uploads, filename), processed.buffer);
 
   const alt = String(form.get('alt') || '').slice(0, 200);
-  const kind = kindSchema.safeParse(form.get('kind') || 'backstage');
-  if (!kind.success) return Response.json({ error: 'invalid kind' }, { status: 400 });
   const max = db.select({ m: sql<number>`max(sort_order)` }).from(photos).all()[0]?.m ?? 0;
   await db
     .insert(photos)
-    .values({ filename, alt: alt || null, kind: kind.data, sortOrder: max + 1 });
-  return Response.json({ ok: true, filename, kind: kind.data });
+    .values({ filename, alt: alt || null, kind: 'contest', sortOrder: max + 1 });
+  return Response.json({ ok: true, filename });
 };
 
 export const DELETE: APIRoute = async ({ request }) => {
@@ -78,10 +69,9 @@ export const DELETE: APIRoute = async ({ request }) => {
   const rows = await db.select().from(photos).where(eq(photos.id, id));
   const photo = rows[0];
   if (!photo) return Response.json({ error: 'not found' }, { status: 404 });
-  // Las fotos del repo viven en la imagen del contenedor: se borran del codigo, no desde aca.
-  if (photo.filename.startsWith('/')) {
+  if (photo.kind !== 'contest' || photo.filename.startsWith('/')) {
     return Response.json(
-      { error: 'las fotos del repo se borran del codigo, no desde el panel' },
+      { error: 'esa foto no es una candidata del concurso y no se puede borrar desde el panel' },
       { status: 409 },
     );
   }

@@ -1,0 +1,154 @@
+---
+import Layout from '../layouts/Layout.astro';
+import '../lib/env';
+import { contestStatus } from '../lib/contest';
+
+const abierto = contestStatus() === 'open';
+---
+
+<Layout title="Votá los premios">
+  <section class="mx-auto max-w-5xl px-4 py-12">
+    <p class="text-center">
+      <a href="/" class="text-sm text-neon-cyan hover:underline focus:outline-none focus:ring-2 focus:ring-neon-magenta">Volver a la invitación</a>
+    </p>
+    <h1 class="mt-4 text-center text-3xl font-bold text-neon-cyan neon-text">Votá los premios</h1>
+    <p class="mx-auto mt-2 max-w-2xl text-center text-gray-200">
+      Elegí una foto por categoría. Se puede votar desde el celular, sin cuenta.
+    </p>
+
+    <p id="vote-unavailable" class="mt-8 text-center text-gray-300" hidden={abierto}>
+      La votación no está disponible en este momento. Volvé cuando la organización abra el concurso.
+    </p>
+
+    <div id="vote-app" class="mt-8" hidden={!abierto}>
+      <p id="vote-progress" class="text-center text-sm text-gray-400" aria-live="polite"></p>
+      <h2 id="vote-category" class="mt-2 text-center text-xl font-semibold text-cinema-gold"></h2>
+      <p id="vote-teaser" class="text-center text-sm text-gray-300"></p>
+      <div id="vote-candidates" class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4"></div>
+      <div class="mt-5 text-center">
+        <button id="vote-confirm" type="button" disabled class="rounded bg-neon-green px-6 py-3 font-semibold text-black disabled:cursor-not-allowed disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-neon-cyan">Confirmar voto</button>
+      </div>
+      <p id="vote-error" class="mt-2 text-center text-sm text-red-400" role="alert" hidden></p>
+      <p id="vote-done" class="mt-2 text-center text-neon-green" role="status" hidden>¡Listo! Ya votaste en todas las categorías.</p>
+    </div>
+  </section>
+
+  <script>
+    const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+
+    const unavailable = document.getElementById('vote-unavailable')!;
+    const app = document.getElementById('vote-app')!;
+    const progress = document.getElementById('vote-progress')!;
+    const categoryEl = document.getElementById('vote-category')!;
+    const teaserEl = document.getElementById('vote-teaser')!;
+    const candidatesEl = document.getElementById('vote-candidates')!;
+    const confirmBtn = document.getElementById('vote-confirm') as HTMLButtonElement;
+    const errorEl = document.getElementById('vote-error')!;
+    const doneEl = document.getElementById('vote-done')!;
+
+    let candidates: any[] | null = null;
+    let renderedCategoryId: number | null = null;
+    let selectedPhotoId: number | null = null;
+    let pollTimer: ReturnType<typeof setInterval> | null = null;
+
+    async function loadCandidates() {
+      if (candidates) return;
+      try {
+        const r = await fetch('/api/photos');
+        candidates = (await r.json()).photos || [];
+      } catch { candidates = []; }
+    }
+
+    function renderCandidates() {
+      candidatesEl.innerHTML = '';
+      for (const p of candidates || []) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'vote-candidate overflow-hidden rounded-lg border-2 border-transparent bg-[#15151c] focus:outline-none focus:ring-2 focus:ring-neon-cyan';
+        btn.dataset.id = String(p.id);
+        btn.setAttribute('aria-pressed', 'false');
+        btn.setAttribute('aria-label', p.alt || 'Votar por esta foto');
+        btn.innerHTML = `<img src="${esc(p.url)}" alt="" loading="lazy" class="aspect-[3/4] w-full object-cover" />`;
+        btn.addEventListener('click', () => {
+          errorEl.hidden = true;
+          const id = selectedPhotoId === p.id ? null : p.id;
+          selectedPhotoId = id;
+          candidatesEl.querySelectorAll<HTMLElement>('.vote-candidate').forEach((b) => {
+            const on = Number(b.dataset.id) === id;
+            b.setAttribute('aria-pressed', String(on));
+            b.classList.toggle('border-neon-green', on);
+          });
+          confirmBtn.disabled = id === null;
+        });
+        candidatesEl.appendChild(btn);
+      }
+    }
+
+    function render(state: any) {
+      const open = state.status === 'open';
+      unavailable.hidden = open;
+      app.hidden = !open;
+      if (!open) {
+        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+        return;
+      }
+      const pending = (state.categories || []).filter((c: any) => !c.voted);
+      doneEl.hidden = pending.length > 0;
+      if (!pending.length) {
+        renderedCategoryId = null;
+        selectedPhotoId = null;
+        confirmBtn.disabled = true;
+        candidatesEl.innerHTML = '';
+        categoryEl.textContent = '';
+        teaserEl.textContent = '';
+        progress.textContent = `Votaste ${state.categories.length} de ${state.categories.length}`;
+        return;
+      }
+      const cat = pending.find((c: any) => c.id === renderedCategoryId) || pending[0];
+      if (cat.id !== renderedCategoryId) {
+        renderedCategoryId = cat.id;
+        selectedPhotoId = null;
+        confirmBtn.disabled = true;
+        renderCandidates();
+      }
+      categoryEl.textContent = `${cat.emoji} ${cat.title}`;
+      teaserEl.textContent = cat.teaser;
+      progress.textContent = `Votaste ${state.categories.length - pending.length} de ${state.categories.length}`;
+    }
+
+    async function refresh() {
+      try {
+        const r = await fetch('/api/contest');
+        if (!r.ok) return;
+        const state = await r.json();
+        if (state.status === 'open') await loadCandidates();
+        render(state);
+      } catch {}
+    }
+
+    confirmBtn.addEventListener('click', async () => {
+      if (!selectedPhotoId || !renderedCategoryId) return;
+      confirmBtn.disabled = true;
+      errorEl.hidden = true;
+      const r = await fetch('/api/contest/vote', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ categoryId: renderedCategoryId, photoId: selectedPhotoId }),
+      });
+      if (r.ok) {
+        renderedCategoryId = null;
+        selectedPhotoId = null;
+        await refresh();
+      } else {
+        const j = await r.json().catch(() => ({}));
+        errorEl.textContent = j.error === 'ya votaste en esta categoria'
+          ? 'Ya habías votado en esta categoría.'
+          : 'No se pudo registrar el voto. Probá de nuevo.';
+        errorEl.hidden = false;
+        confirmBtn.disabled = selectedPhotoId === null;
+      }
+    });
+
+    refresh();
+    pollTimer = setInterval(refresh, 3000);
+  </script>
+</Layout>

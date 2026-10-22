@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import '../lib/env';
 import { EVENT } from '../data/event';
 import { AWARDS, AWARDS_INTRO } from '../data/awards';
 import { MOVIES } from '../data/movies';
@@ -7,6 +8,11 @@ import { MOVIES } from '../data/movies';
 const mitad = Math.ceil(MOVIES.length / 2);
 const peliculasArriba = MOVIES.slice(0, mitad);
 const peliculasAbajo = MOVIES.slice(mitad).reverse();
+
+const giftAlias = process.env.GIFT_ALIAS;
+const giftRecipient = process.env.GIFT_RECIPIENT;
+const giftAccount = process.env.GIFT_ACCOUNT;
+const giftConfigured = Boolean(giftAlias && giftRecipient);
 ---
 
 <Layout title="Juli: capitulo 30, la pelicula">
@@ -15,7 +21,10 @@ const peliculasAbajo = MOVIES.slice(mitad).reverse();
 
   <section id="hero" class="relative flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
     <p class="text-neon-cyan neon-text text-sm tracking-widest uppercase">Estreno · {EVENT.date}</p>
-    <h1 class="text-4xl font-bold text-neon-magenta neon-text sm:text-6xl">Juli: tener 30, ser coqueta y prospera</h1>
+    <h1 class="text-4xl font-bold text-neon-magenta neon-text sm:text-6xl">Juli protagoniza:</h1>
+    <div class="marquee w-full max-w-2xl text-3xl font-bold text-neon-green neon-text sm:text-5xl">
+      <span>legalmente 30</span>
+    </div>
     <p class="max-w-xl text-lg text-gray-200">
       Algunas historias merecen una secuela. La mía cumple 30 y la fiesta es de disfraces. ¿Te sumás al reparto?
     </p>
@@ -37,52 +46,38 @@ const peliculasAbajo = MOVIES.slice(mitad).reverse();
     <a href={EVENT.mapsUrl} target="_blank" rel="noopener" class="mt-5 inline-block rounded border border-neon-cyan px-4 py-2 text-neon-cyan hover:bg-neon-cyan hover:text-black focus:outline-none focus:ring-2 focus:ring-neon-magenta">Ver en Google Maps</a>
   </section>
 
-  <div class="relative mx-auto max-w-6xl px-4 py-8">
-    <div class="photo-strip grid grid-cols-2 gap-3 md:grid-cols-4" data-strip="0"></div>
-  </div>
-
-  <!-- Dress code -->
-  <section class="relative mx-auto max-w-2xl px-4 py-16 text-center">
-    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-4">Dress code</h2>
-    <p class="text-gray-200">Disfraz obligatorio y temático. Si venís de civil, te toca ser extra de fondo.</p>
+  <!-- Foto destacada de Juli, justo debajo de la ubicacion -->
+  <section class="relative mx-auto max-w-2xl px-4 pb-8">
+    <img
+      src="/img/photos/julifiesta.webp"
+      alt="Juli con saco blanco y short rosa en la fiesta, de noche, entre luces de colores"
+      loading="lazy"
+      class="w-full rounded-xl border border-neon-cyan/25 object-cover"
+    />
   </section>
 
-  <div class="relative mx-auto max-w-6xl px-4 py-8">
-    <div class="photo-strip grid grid-cols-2 gap-3 md:grid-cols-4" data-strip="1"></div>
-  </div>
-
-  <!-- Solo adultos -->
-  <section class="relative mx-auto max-w-2xl px-4 py-16 text-center">
-    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-4">Solo adultos</h2>
-    <p class="text-xl text-gray-100 font-semibold">Público: +18</p>
-    <p class="text-gray-200 mt-3">
-      Si sos menor de edad, te toca ver la película desde la butaca de atrás: sin palomitas,
-      sin volumen y sin drama. Esta función es solo para adultos disfrazados.
-    </p>
-  </section>
-
-  <div class="relative mx-auto max-w-6xl px-4 py-8">
-    <div class="photo-strip grid grid-cols-2 gap-3 md:grid-cols-4" data-strip="2"></div>
-  </div>
-
-  <!-- Qué hay que traer -->
-  <section class="relative mx-auto max-w-2xl px-4 py-16">
-    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-4 text-center">Qué hay que traer</h2>
-    <ul class="mx-auto mt-4 max-w-xl space-y-4">
-      <li class="rounded border border-neon-cyan/25 bg-gray-950/60 p-4">
+  <!-- Qué hay que traer: dress code, adultos y bebida en tarjetas compactas -->
+  <section id="que-traer" class="relative mx-auto max-w-3xl px-4 py-16">
+    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-6 text-center">Qué hay que traer</h2>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div class="rounded border border-neon-cyan/25 bg-gray-950/60 p-4">
+        <h3 class="font-semibold text-neon-magenta flex items-center gap-2"><span aria-hidden="true">🎭</span> Disfraz obligatorio</h3>
+        <p class="text-sm text-gray-200 mt-1">Disfraz obligatorio y temático. Si venís de civil, te toca ser extra de fondo. Durante la noche se entregan premios especiales.</p>
+      </div>
+      <div class="rounded border border-neon-cyan/25 bg-gray-950/60 p-4">
+        <h3 class="font-semibold text-neon-magenta flex items-center gap-2"><span aria-hidden="true">🥂</span> Solo adultos</h3>
+        <p class="text-sm text-gray-200 mt-1">Esta función es para adultos. No traigas chicos: la noche es para grandes disfrazados.</p>
+      </div>
+      <div class="rounded border border-neon-cyan/25 bg-gray-950/60 p-4">
         <h3 class="font-semibold text-neon-magenta flex items-center gap-2"><span aria-hidden="true">🎟️</span> Tu presencia</h3>
         <p class="text-sm text-gray-200 mt-1">Lo único imprescindible. Con aparecer ya ganás el premio al mejor apoyo.</p>
-      </li>
-      <li class="rounded border border-neon-cyan/25 bg-gray-950/60 p-4">
+      </div>
+      <div class="rounded border border-neon-cyan/25 bg-gray-950/60 p-4">
         <h3 class="font-semibold text-neon-magenta flex items-center gap-2"><span aria-hidden="true">🍸</span> Lo que vayas a tomar</h3>
         <p class="text-sm text-gray-200 mt-1">Cada uno trae su propia bebida alcohólica: cerveza, vino, vodka, fernet, lo que tomes. Si no tomás, también vale tu presencia.</p>
-      </li>
-    </ul>
+      </div>
+    </div>
   </section>
-
-  <div class="relative mx-auto max-w-6xl px-4 py-8">
-    <div class="photo-strip grid grid-cols-2 gap-3 md:grid-cols-4" data-strip="3"></div>
-  </div>
 
   <!-- Carrusel de peliculas: reemplaza las ideas de disfraz -->
   <section class="relative mx-auto max-w-6xl px-4 py-16">
@@ -105,15 +100,16 @@ const peliculasAbajo = MOVIES.slice(mitad).reverse();
     <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-4 text-center">Los Premios de la Noche</h2>
     <p class="text-center text-gray-200 max-w-2xl mx-auto">{AWARDS_INTRO}</p>
     <p class="mt-5 text-center">
-      <a id="ir-a-votar" href="#concurso" class="inline-block rounded bg-neon-magenta px-5 py-3 font-semibold text-black hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-neon-cyan focus:ring-offset-2 focus:ring-offset-cinema-black">Votar por los premios</a>
+      <a id="ir-a-votar" href="/votar" hidden class="inline-block rounded bg-neon-magenta px-5 py-3 font-semibold text-black hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-neon-cyan focus:ring-offset-2 focus:ring-offset-cinema-black">Votar por los premios</a>
     </p>
+    <p id="awards-more" class="mt-5 text-center text-gray-300">y varias categorías más</p>
     <div id="premios-suspenso" hidden class="mt-6 text-center" role="status" aria-live="polite">
       <p class="text-4xl" aria-hidden="true">🎬</p>
       <p class="mt-2 font-semibold text-neon-magenta neon-text motion-safe:animate-pulse">Revelando ganadores…</p>
     </div>
     <ul class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-      {AWARDS.map((a) => (
-        <li class="rounded border border-cinema-gold/40 bg-gray-950/60 p-3 text-sm" data-award={a.slug}>
+      {AWARDS.map((a, i) => (
+        <li class="rounded border border-cinema-gold/40 bg-gray-950/60 p-3 text-sm" data-award={a.slug} hidden={i >= 2}>
           <div class="award-winner" hidden></div>
           <p><span aria-hidden="true">{a.emoji}</span> <span class="font-semibold text-cinema-gold">{a.title}</span></p>
           <p class="text-gray-400 mt-1">{a.teaser}</p>
@@ -122,33 +118,32 @@ const peliculasAbajo = MOVIES.slice(mitad).reverse();
     </ul>
   </section>
 
-  <!-- Concurso: votacion por categoria y anuncio de ganadores -->
-  <section id="concurso" tabindex="-1" class="relative mx-auto max-w-5xl scroll-mt-6 px-4 py-16">
-    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-2 text-center">Votá los premios</h2>
-    <p class="text-center text-gray-200 max-w-2xl mx-auto">
-      Elegí una foto por categoría. Se puede votar desde el celular, sin cuenta.
-    </p>
-
-    <p id="contest-idle" class="mt-6 text-center text-gray-300" hidden>
-      El voting todavía no abrió. Cuando la organización lo abra, podés votar desde acá.
-    </p>
-    <p id="contest-closed" class="mt-6 text-center text-gray-300" hidden>
-      El concurso ya cerró. Los ganadores están en las cards de premios.
-    </p>
-    <p id="contest-done" class="mt-6 text-center text-neon-green" role="status" aria-live="polite" hidden>
-      ¡Listo! Ya votaste en todas las categorías.
-    </p>
-
-    <div id="contest-body" class="mt-6" hidden>
-      <p id="contest-progress" class="text-center text-sm text-gray-400"></p>
-      <h3 id="contest-category" class="mt-2 text-center text-xl font-semibold text-cinema-gold"></h3>
-      <p id="contest-teaser" class="text-center text-sm text-gray-300"></p>
-      <div id="contest-candidates" class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4"></div>
-      <div class="mt-5 text-center">
-        <button id="contest-confirm" type="button" disabled class="rounded bg-neon-green px-6 py-3 font-semibold text-black disabled:cursor-not-allowed disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-neon-cyan">Confirmar voto</button>
+  <!-- Regalos -->
+  <section id="regalos" class="relative mx-auto max-w-2xl px-4 py-16 text-center">
+    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-4">Regalos</h2>
+    {giftConfigured ? (
+      <div class="mx-auto max-w-md rounded border border-cinema-gold/40 bg-gray-950/60 p-4">
+        <p class="text-gray-200">Si querés hacerme un regalo, podés transferir a:</p>
+        <p class="mt-3 text-cinema-gold font-semibold">Alias: {giftAlias}</p>
+        <p class="text-gray-200">{giftRecipient}</p>
+        {giftAccount && <p class="text-gray-400 text-sm mt-1">Cuenta: {giftAccount}</p>}
       </div>
-      <p id="contest-error" class="mt-2 text-center text-sm text-red-400" role="alert" hidden></p>
-    </div>
+    ) : (
+      <p class="mx-auto max-w-md rounded border border-cinema-gold/40 bg-gray-950/60 p-4 text-gray-300">
+        Estamos preparando los datos para regalos. Pronto vas a poder ver acá el alias y la cuenta.
+      </p>
+    )}
+  </section>
+
+  <!-- Julilogramos antes de la playlist -->
+  <section class="relative mx-auto max-w-2xl px-4 py-16 text-center">
+    <h2 class="text-2xl font-bold text-neon-cyan neon-text mb-4">Te espero, no me falles</h2>
+    <img
+      src="/img/photos/juli-logramos-2025.webp"
+      alt="Juli sosteniendo un cartel de “Lo logramos 2025” junto a la fuente iluminada"
+      loading="lazy"
+      class="mx-auto w-full rounded-xl border border-neon-cyan/25 object-cover"
+    />
   </section>
 
   <!-- Playlist -->
@@ -301,123 +296,20 @@ const peliculasAbajo = MOVIES.slice(mitad).reverse();
       else { trackStatus.textContent = 'No se pudo agregar.'; }
     });
 
-    // Tiras de fotos: la foto i va a la tira i % 4 (reparto determinista, D11).
-    const stripEls = [...document.querySelectorAll<HTMLElement>('.photo-strip')];
-
-    function cardHtml(p: any) {
-      return `<figure class="relative overflow-hidden rounded-xl bg-[#15151c]">
-        <img src="${esc(p.url)}" alt="${esc(p.alt || 'Foto de la fiesta')}" loading="lazy" class="aspect-[3/4] w-full object-cover" />
-        <button data-id="${p.id}" class="like-btn absolute bottom-2 right-2 flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-full bg-black/60 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-neon-cyan" aria-label="Me gusta esta foto">
-          <span class="heart" aria-hidden="true">${p.liked ? '❤️' : '🤍'}</span> <span class="count">${p.likes}</span>
-        </button>
-      </figure>`;
-    }
-
-    async function loadStrips() {
-      try {
-        const r = await fetch('/api/photos');
-        const j = await r.json();
-        stripEls.forEach((s) => { s.innerHTML = ''; });
-        (j.photos || []).forEach((p: any, i: number) => {
-          stripEls[i % stripEls.length].insertAdjacentHTML('beforeend', cardHtml(p));
-        });
-      } catch {}
-    }
-    loadStrips();
-
-    document.addEventListener('click', async (e) => {
-      const btn = (e.target as HTMLElement).closest('.like-btn') as HTMLElement | null;
-      if (!btn) return;
-      const id = Number(btn.dataset.id);
-      const r = await fetch('/api/likes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ photoId: id }) });
-      if (!r.ok) return;
-      const j = await r.json();
-      document.querySelectorAll(`.like-btn[data-id="${id}"]`).forEach((b) => {
-        (b.querySelector('.count') as HTMLElement).textContent = String(j.likes);
-        (b.querySelector('.heart') as HTMLElement).textContent = '❤️';
-      });
-    });
-
-    // Concurso: estado en vivo, votacion por categoria y reveal con suspenso.
-    const contestIdle = document.getElementById('contest-idle')!;
-    const contestClosed = document.getElementById('contest-closed')!;
-    const contestDone = document.getElementById('contest-done')!;
-    const contestBody = document.getElementById('contest-body')!;
-    const contestProgress = document.getElementById('contest-progress')!;
-    const contestCategory = document.getElementById('contest-category')!;
-    const contestTeaser = document.getElementById('contest-teaser')!;
-    const contestCandidates = document.getElementById('contest-candidates')!;
-    const contestConfirm = document.getElementById('contest-confirm') as HTMLButtonElement;
-    const contestError = document.getElementById('contest-error')!;
+    // Premios: preview de dos categorias y reveal de ganadores segun el estado del concurso.
     const suspenso = document.getElementById('premios-suspenso')!;
+    const awardsMore = document.getElementById('awards-more')!;
+    const voteBtn = document.getElementById('ir-a-votar')!;
+    const awardItems = [...document.querySelectorAll<HTMLElement>('[data-award]')];
 
-    let candidates: any[] | null = null;
-    let renderedCategoryId: number | null = null;
-    let selectedPhotoId: number | null = null;
     let revealed = false;
     let pollTimer: ReturnType<typeof setInterval> | null = null;
-    let previousStatus: string | null = null;
 
-    async function loadCandidates() {
-      if (candidates) return;
-      try {
-        const r = await fetch('/api/photos?kind=contest');
-        candidates = (await r.json()).photos || [];
-      } catch { candidates = []; }
-    }
-
-    function renderCandidates() {
-      contestCandidates.innerHTML = '';
-      for (const p of candidates || []) {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'contest-candidate overflow-hidden rounded-lg border-2 border-transparent bg-[#15151c] focus:outline-none focus:ring-2 focus:ring-neon-cyan';
-        btn.dataset.id = String(p.id);
-        btn.setAttribute('aria-pressed', 'false');
-        btn.setAttribute('aria-label', p.alt || 'Votar por esta foto');
-        btn.innerHTML = `<img src="${esc(p.url)}" alt="" loading="lazy" class="aspect-[3/4] w-full object-cover" />`;
-        btn.addEventListener('click', () => {
-          contestError.hidden = true;
-          const id = selectedPhotoId === p.id ? null : p.id;
-          selectedPhotoId = id;
-          contestCandidates.querySelectorAll<HTMLElement>('.contest-candidate').forEach((b) => {
-            const on = Number(b.dataset.id) === id;
-            b.setAttribute('aria-pressed', String(on));
-            b.classList.toggle('border-neon-green', on);
-          });
-          contestConfirm.disabled = id === null;
-        });
-        contestCandidates.appendChild(btn);
-      }
-    }
-
-    function renderContest(state: any) {
-      const open = state.status === 'open';
-      const pending = (state.categories || []).filter((c: any) => !c.voted);
-      contestIdle.hidden = state.status !== 'idle';
-      contestClosed.hidden = state.status !== 'closed';
-      contestBody.hidden = !open || pending.length === 0;
-      contestDone.hidden = !open || pending.length > 0;
-
-      if (previousStatus === 'open' && state.status === 'closed') loadStrips();
-      previousStatus = state.status;
-
-      if (!open || !pending.length) {
-        renderedCategoryId = null;
-        selectedPhotoId = null;
-        contestConfirm.disabled = true;
-        return;
-      }
-      const cat = pending.find((c: any) => c.id === renderedCategoryId) || pending[0];
-      if (cat.id !== renderedCategoryId) {
-        renderedCategoryId = cat.id;
-        selectedPhotoId = null;
-        contestConfirm.disabled = true;
-        renderCandidates();
-      }
-      contestCategory.textContent = `${cat.emoji} ${cat.title}`;
-      contestTeaser.textContent = cat.teaser;
-      contestProgress.textContent = `Votaste ${state.categories.length - pending.length} de ${state.categories.length}`;
+    function renderAwards(state: any) {
+      const reveal = state.status === 'open' || state.status === 'closed';
+      awardItems.forEach((li, i) => { if (i >= 2) li.hidden = !reveal; });
+      awardsMore.hidden = reveal;
+      voteBtn.hidden = state.status !== 'open';
     }
 
     function revealWinners(state: any) {
@@ -430,9 +322,8 @@ const peliculasAbajo = MOVIES.slice(mitad).reverse();
         for (const w of winners) {
           const box = document.querySelector<HTMLElement>(`[data-award="${w.slug}"] .award-winner`);
           if (!box) continue;
-          const cand = (candidates || []).find((p: any) => p.id === w.winnerPhotoId);
-          const url = cand ? cand.url : `/api/photos/${w.winnerPhotoId}/file`;
-          const alt = cand?.alt || `Ganador: ${w.title}`;
+          const url = `/api/photos/${w.winnerPhotoId}/file`;
+          const alt = `Ganador: ${w.title}`;
           const votes = w.winnerVotes ? `<p class="mt-1 text-xs text-neon-green">${w.winnerVotes} votos</p>` : '';
           box.innerHTML = `<img src="${esc(url)}" alt="${esc(alt)}" loading="lazy" class="aspect-[3/4] w-full rounded object-cover" />${votes}`;
           box.hidden = false;
@@ -448,8 +339,7 @@ const peliculasAbajo = MOVIES.slice(mitad).reverse();
         const r = await fetch('/api/contest');
         if (!r.ok) return;
         const state = await r.json();
-        if (state.status !== 'idle') await loadCandidates();
-        renderContest(state);
+        renderAwards(state);
         if (state.status === 'closed') {
           if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
           revealWinners(state);
@@ -457,34 +347,8 @@ const peliculasAbajo = MOVIES.slice(mitad).reverse();
       } catch {}
     }
 
-    contestConfirm.addEventListener('click', async () => {
-      if (!selectedPhotoId || !renderedCategoryId) return;
-      contestConfirm.disabled = true;
-      contestError.hidden = true;
-      const r = await fetch('/api/contest/vote', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ categoryId: renderedCategoryId, photoId: selectedPhotoId }),
-      });
-      if (r.ok) {
-        renderedCategoryId = null;
-        selectedPhotoId = null;
-        await refreshContest();
-      } else {
-        const j = await r.json().catch(() => ({}));
-        contestError.textContent = j.error === 'ya votaste en esta categoria'
-          ? 'Ya habías votado en esta categoría.'
-          : 'No se pudo registrar el voto. Probá de nuevo.';
-        contestError.hidden = false;
-        contestConfirm.disabled = selectedPhotoId === null;
-      }
-    });
-
-    document.getElementById('ir-a-votar')!.addEventListener('click', () => {
-      document.getElementById('concurso')!.focus({ preventScroll: true });
-    });
-
     refreshContest();
-    pollTimer = setInterval(refreshContest, 2000);
+    pollTimer = setInterval(refreshContest, 3000);
 
   </script>
 

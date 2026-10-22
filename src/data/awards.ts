@@ -31,16 +31,40 @@ export const AWARDS: Award[] = [
     emoji: '📼',
   },
   {
-    slug: 'premio-casa-de-los-espellos',
-    title: 'Premio de la Casa de los Espellos',
-    teaser: 'El mejor reflejo de la pista',
-    emoji: '🪞',
+    slug: 'premio-mejor-frase-iconica',
+    title: 'Premio a la Mejor Frase Icónica',
+    teaser: 'La frase del personaje que todos repetimos toda la noche',
+    emoji: '💬',
   },
   {
-    slug: 'premio-esfuerzo-heroico',
-    title: 'Premio al Esfuerzo Heroico',
-    teaser: 'Hecho a mano, con dedicación y maquillaje',
-    emoji: '🎖️',
+    slug: 'premio-no-entendi-quien-eras',
+    title: 'Premio ‘No Entendí Quién Eras’',
+    teaser: 'El disfraz tan enigmático que nadie adivinó qué era',
+    emoji: '🕵️',
+  },
+  {
+    slug: 'premio-exito-de-taquilla',
+    title: 'Premio Éxito de Taquilla',
+    teaser: 'El disfraz que todos quieren fotografiar',
+    emoji: '🎟️',
+  },
+  {
+    slug: 'mejor-presupuesto-minimo',
+    title: 'Mejor Presupuesto Mínimo',
+    teaser: 'El disfraz más ingenioso con menos plata',
+    emoji: '🪙',
+  },
+  {
+    slug: 'alma-de-la-fiesta',
+    title: 'Alma de la Fiesta',
+    teaser: 'El que prende la pista y contagia las ganas',
+    emoji: '🔥',
+  },
+  {
+    slug: 'mejor-paso-prohibido',
+    title: 'Mejor Paso Prohibido',
+    teaser: 'El baile más ridículo y divertido de la noche',
+    emoji: '🕺',
   },
 ];
 
