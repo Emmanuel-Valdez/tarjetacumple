@@ -1,8 +1,8 @@
 # Tarjeta Cumple — Invitación web (Astro SSR)
 
-Invitación web de cumpleaños con tema *fiesta en el cine*: disfraces de películas/series, premios "Oscar" de la noche y banda sonora entre todos.
+Invitación web de cumpleaños con tema *fiesta en el cine*: disfraces de películas/series, premios "Oscar" votados por los invitados y playlist armada entre todos.
 
-> **Sin datos personales en el README** (decisión de privacidad): la fecha, la hora, el lugar y la dirección no se documentan acá. Viven en un único lugar, `src/data/event.ts` (fuente de contenido).
+> **Sin datos personales en la documentación**: fecha, hora, lugar y dirección viven únicamente en `src/data/event.ts` y no se repiten acá, en `AGENTS.md` ni en las specs.
 
 ## Stack
 
@@ -10,7 +10,9 @@ Invitación web de cumpleaños con tema *fiesta en el cine*: disfraces de pelíc
 - **SQLite** con Drizzle ORM (better-sqlite3, WAL)
 - **sharp** para reescalar/convertir imágenes a WebP
 - **Docker Compose** + Nginx + Cloudflare (deploy en VPS Oracle)
-- **OpenSpec** para specs/tasks (`openspec/changes/juli30-landing/`)
+- **OpenSpec** para specs y changes (`openspec/`)
+
+Requiere Node 22.22 o superior.
 
 ## Comandos
 
@@ -23,13 +25,15 @@ npm run check            # astro check (tipos)
 
 npm run db:generate      # generar migración drizzle
 npm run db:migrate       # aplicar migraciones
-npm run photos:prepare   # src/img/*.jpg -> public/img/photos/*.webp + src/data/gallery.ts
-npm run movies:prepare   # src/img/movies/* -> public/img/movies/*.webp + src/data/movies.ts
-npm run db:clean         # borrar datos de prueba (rsvps, likes, tracks, fotos subidas)
 npm run db:backup        # backup online del SQLite (incluye el WAL) a data/backups/
+npm run db:clean         # borrar datos de prueba (rsvps, canciones, likes y fotos subidas)
+
+npm run photos:prepare   # src/img/* -> public/img/photos/*.webp + fondos + gallery.ts
+npm run movies:prepare   # src/img/movies/* -> public/img/movies/*.webp + movies.ts
+npm run og:prepare       # public/img/og.png (1200x630) desde el fondo
 ```
 
-Dev server en background (según AGENTS.md):
+Dev server en background:
 
 ```bash
 npx astro dev --background
@@ -42,56 +46,64 @@ npx astro dev stop
 
 ```
 src/
-  data/          # contenido editable: event.ts, awards.ts, gallery.ts y movies.ts (generados)
-  db/            # schema.ts (drizzle) + index.ts (conexión, migración y seed)
-  layouts/       # Layout.astro
-  lib/           # auth.ts (sesiones), visitor.ts (cookie anonima), images.ts (sharp), env.ts
+  data/          # contenido: event.ts, awards.ts y movies.ts (generado)
+  db/            # schema.ts (drizzle) + index.ts (conexión y migración)
+  layouts/       # Layout.astro (head, OG, skip link)
+  lib/           # auth.ts, visitor.ts, images.ts, contest.ts, env.ts
   pages/
     index.astro  # landing
-    votar.astro  # vista de votación del concurso
-    admin/       # panel (login + RSvps + canciones + fotos)
-    api/         # endpoints: rsvp, tracks, photos, contest, admin/*
-public/
-  img/           # TODAS las imagenes servidas (versionado en git)
-    fondo-desktop.webp   # fondo horizontal (landscape)
-    fondo-mobile.webp    # fondo vertical (portrait)
-    favicon.svg          # icono zombie de MJ
-    apple-touch-icon.png # 180x180
-    icon-512.png         # 512x512
-    photos/              # galeria y disfraces (576px)
-    movies/              # carrusel de peliculas (360x480)
+    votar.astro  # votación del concurso
+    admin/       # login + panel (RSVPs, canciones, fotos, concurso)
+    api/         # endpoints (ver tabla abajo)
+  styles/        # global.css (tokens de tema, tipografía y fondos)
+drizzle/         # migraciones SQL + snapshots
+scripts/         # preparación de imágenes, backup y limpieza
+openspec/        # specs vigentes y changes
+public/img/      # imágenes servidas y versionadas
 data/            # db.sqlite + uploads (NO versionado)
 ```
 
-## Contenido editable (sin tocar componentes)
+## Contenido editable
 
 | Archivo | Qué define |
 |---|---|
-| `src/data/event.ts` | fecha, hora, lugar, dirección, link de Maps, playlist de Spotify |
-| `src/data/awards.ts` | premios "Oscar"; antes de abrir el concurso se muestran 2 categorías de adelanto y al abrirlo las 10 |
-| `src/data/gallery.ts` | **generado** por `npm run photos:prepare` — no editar a mano |
+| `src/data/event.ts` | fecha, hora, lugar, dirección, Maps, playlist de Spotify y hashtag |
+| `src/data/awards.ts` | categorías del concurso (slug, título, descripción y emoji) |
 | `src/data/movies.ts` | **generado** por `npm run movies:prepare` — carrusel de películas |
 
-Fotos nuevas: dejarlas en `src/img/` y correr `npm run photos:prepare`. Imágenes del carrusel: en `src/img/movies/` y `npm run movies:prepare`.
+`src/data/gallery.ts` también se genera con `npm run photos:prepare`, pero hoy no lo consume ninguna página: las fotos que se votan se suben desde `/admin`.
 
-Los dos scripts son **aditivos**: conservan los `.webp` ya generados aunque su original ya no esté en `src/img/`, así que los originales se pueden borrar sin perder nada. Lo que se sirve (`public/img/`) es lo que está versionado en git.
+## Concurso de premios
 
-## Variables de entorno
+Máquina de tres estados en la tabla `contest` (fila única):
 
-Copia `.env.example` a `.env` y cambiá las claves.
+- `idle` → `open`: al abrir se congelan las categorías de `awards.ts` en la base.
+- `open` → `closed`: al cerrar se calculan y congelan los ganadores. **Cerrar es definitivo.**
+- `reset`: borra votos y ganadores y vuelve a `idle`. Pide escribir `reiniciar`; es solo para ensayar.
 
-| Variable | Para qué |
-|---|---|
-| `SESSION_SECRET` | Firma las cookies de sesión del admin (HMAC). **Obligatorio en producción**; con el mismo valor nadie puede suplantar a Juli ni a la organizadora. Generalo con `openssl rand -hex 32`. |
-| `ADMIN_JULI_USER` / `ADMIN_JULI_PASSWORD` | Login de Juli (no ve dedicatorias) |
-| `ADMIN_ORGANIZER_USER` / `ADMIN_ORGANIZER_PASSWORD` | Login de la organizadora (ve dedicatorias) |
-| `DATABASE_PATH` | Ruta del `.sqlite` (prod: `/data/db.sqlite`) |
-| `UPLOADS_PATH` | Carpeta de fotos subidas (prod: `/data/uploads`) |
+Los invitados votan en `/votar`, una foto por categoría, con la cookie anónima `visitor_id`. El orden de categorías es aleatorio y el tally no se muestra hasta el cierre. Las fotos candidatas solo se exponen mientras el concurso está abierto.
+
+**Antes del evento**: ajustar `src/data/awards.ts`, hacer deploy y subir las fotos candidatas desde `/admin`. La noche del evento todo se maneja desde el panel.
 
 ## Roles del panel
 
-- **Juli** (`/admin`): ve y borra RSVPs, gestiona canciones y fotos. **No** ve dedicatorias.
-- **Organizadora**: lo mismo + ve las dedicatorias (para el video).
+- **Juli** (`juli`): RSVPs, canciones, fotos y concurso. No ve dedicatorias.
+- **Organizadora** (`organizer`): lo mismo + dedicatorias, para el video.
+
+## Variables de entorno
+
+Copiá `.env.example` a `.env`.
+
+| Variable | Para qué |
+|---|---|
+| `SESSION_SECRET` | Firma las cookies de sesión (HMAC). **Obligatorio en producción**; generá con `openssl rand -hex 32`. |
+| `ADMIN_JULI_USER` / `ADMIN_JULI_PASSWORD` | Login de Juli |
+| `ADMIN_ORGANIZER_USER` / `ADMIN_ORGANIZER_PASSWORD` | Login de la organizadora |
+| `GIFT_ALIAS` / `GIFT_RECIPIENT` / `GIFT_ACCOUNT` | Datos de regalos (opcionales; sin alias y destinatario se muestra un placeholder) |
+| `PUBLIC_SITE_URL` | URL pública para las etiquetas Open Graph |
+| `DATABASE_PATH` | Ruta del SQLite (prod: `/data/db.sqlite`) |
+| `UPLOADS_PATH` | Carpeta de fotos subidas (prod: `/data/uploads`) |
+| `PORT` | Puerto del server (prod: `3000`) |
 
 ## API
 
@@ -99,34 +111,48 @@ Copia `.env.example` a `.env` y cambiá las claves.
 |---|---|---|
 | `/api/rsvp` | GET / POST | contador de personas confirmadas / crear RSVP |
 | `/api/tracks` | GET / POST | canciones de la playlist (agrega cualquier invitado) |
-| `/api/photos` | GET | fotos candidatas del concurso |
-| `/api/photos/[id]/file` | GET | sirve fotos subidas desde el volumen |
-| `/api/admin/login` `/logout` | POST | sesión del admin |
-| `/api/admin/rsvps` | GET / DELETE | listar y borrar RSVPs (oculta dedicatorias para Juli) |
+| `/api/photos` | GET | candidatas del concurso (solo con el concurso abierto) |
+| `/api/photos/[id]/file` | GET | sirve una foto subida desde el volumen |
+| `/api/contest` | GET | estado del concurso, categorías pendientes y ganadores al cerrar |
+| `/api/contest/vote` | POST | voto por categoría (uno por visitante) |
+| `/api/admin/login` · `/logout` | POST | sesión del panel |
+| `/api/admin/rsvps` | GET / DELETE | listar y borrar RSVPs |
 | `/api/admin/tracks` | GET / DELETE | listar y borrar canciones |
-| `/api/admin/photos` | GET / POST / DELETE | listar, subir y borrar fotos candidatas del concurso (409 para las del repo o con votos) |
-| `/api/contest` | GET | estado del concurso, categorías pendientes (orden aleatorio) y ganadores al cerrar |
-| `/api/contest/vote` | POST | votar una foto candidata en una categoría (1 por visitante) |
-| `/api/admin/contest` | GET / POST | tally por categoría / abrir, cerrar y reiniciar el concurso |
+| `/api/admin/photos` | GET / POST / DELETE | listar, subir y borrar candidatas (409 para fotos del repo o con votos) |
+| `/api/admin/contest` | GET / POST | tally por categoría / abrir, cerrar y reiniciar |
 
 ## Imágenes
 
-- Las fotos del repo (`src/img/`) se convierten a **WebP** (`public/img/photos/`, máx. 576 px, q82) y los fondos a `public/img/fondo-desktop.webp` (1600 px) y `fondo-mobile.webp` (1200 px). Las fotos destacadas de Juli (julifiesta, julilogramos) se sirven directo desde `public/`.
-- El carrusel de películas usa `src/img/movies/` → `public/img/movies/` (360×480, q75) vía `npm run movies:prepare`.
-- Las subidas desde `/admin` pasan por **sharp**: `rotate()` + resize a **1440 px** de lado mayor (sin agrandar) + WebP q80, con nombre **UUID** (nunca sobreescribe) en el volumen `UPLOADS_PATH` (tope 12 MB de entrada). Se guarda una sola versión; el original no se conserva. Se pueden subir todas las que quieras.
-- Las fotos candidatas del concurso se votan en la vista `/votar`; no se muestran en la landing.
-- **Backup**: `npm run db:backup` (o `docker compose exec app node ./scripts/backup-db.mjs` en prod) escribe un backup consistente en `data/backups/db-<timestamp>.sqlite`.
+- Las fotos estáticas del repo viven en `public/img/photos/` y se sirven directas; `src/img/` (fuentes) está gitignored.
+- `photos:prepare` genera los `.webp` de las fotos, los dos fondos (`fondo-desktop.webp` horizontal y `fondo-mobile.webp` vertical) y `gallery.ts`. Es aditivo: conserva los `.webp` aunque su original ya no esté.
+- `movies:prepare` genera el carrusel (360×480, q75).
+- Las subidas del admin pasan por **sharp**: `rotate()` + resize a **1440 px** de lado mayor (sin agrandar) + WebP q80, con nombre UUID en `UPLOADS_PATH`. Tope de entrada: 12 MB. Se puede seleccionar más de una foto.
+- El admin solo lista y borra fotos `contest` subidas: las del repo dan 409, y una foto con votos también.
+
+## Backup
+
+`npm run db:backup` usa `db.backup()` de better-sqlite3 y escribe `data/backups/db-<timestamp>.sqlite` (copia consistente que incluye el WAL). En producción:
+
+```bash
+docker compose exec app node ./scripts/backup-db.mjs
+```
 
 ## Deploy
 
-El build ocurre **en el VPS** (el paquete de Docker no se publica).
+El build ocurre **en el VPS**; no se publica imagen.
 
-1. En el VPS: `git clone <repo> /opt/juli30/app`, crear `/opt/juli30/app/.env` con las claves reales, y `docker compose up -d` una vez para crear el volumen.
-2. `git push master` dispara `.github/workflows/deploy.yml` → conecta a Tailscale y por SSH hace `git pull && docker compose build && docker compose up -d` en `/opt/juli30/app`.
-3. Nginx (ver `nginx.conf.example`) hace de reverse proxy TLS → `127.0.0.1:3000`. Cloudflare en modo *Full (strict)*.
+1. En el VPS: `git clone <repo> /opt/juli30/app`, crear `/opt/juli30/app/.env` con las claves reales y `docker compose up -d` una vez para crear el volumen.
+2. `git push master` dispara `.github/workflows/deploy.yml`: conecta por Tailscale y por SSH hace `git pull --ff-only && docker compose build && docker compose up -d` en `/opt/juli30/app`.
+3. Nginx (`nginx.conf.example`) hace de reverse proxy TLS → `127.0.0.1:3000`; Cloudflare en modo *Full (strict)*.
 4. Secretos de GitHub: `VPS_USER`, `VPS_HOST`, `VPS_SSH_KEY`, `TAILSCALE_OAUTH_CLIENT_ID`, `TAILSCALE_OAUTH_SECRET`.
 
-El volumen `juli30_data` guarda `db.sqlite` y `uploads/`: **no se pierde al redeploy**.
+El volumen `juli30_data` guarda `db.sqlite` y `uploads/`: no se pierde al redeploy.
+
+## Documentación
+
+- `AGENTS.md`: reglas y trampas para agentes que trabajan en el repo.
+- `openspec/specs/`: spec vigente por capability (`admin`, `contest`, `gallery`, `landing`, `music`, `playlist`, `rsvp`, `ui-quality`).
+- `PROJECT_CONTEXT.local.md`: estado y pendientes del entorno local (no versionado).
 
 ## Reglas
 
