@@ -35,4 +35,4 @@
 
 - [x] 5.1 `npm run check`: 0 errores, 0 warnings, 0 hints. `npm run build`: completo en 7,6 s.
 - [x] 5.2 Revisado a 375 y 1280: jerarquía visible (h1 36/60, sección 28/40, cuerpo 16), sin scroll horizontal (360/360 y 1265/1265), contraste AA en el copy nuevo y targets de 44 px intactos.
-- [ ] 5.3 Al archivar, sincronizar los deltas a `openspec/specs/landing/spec.md` y `openspec/specs/ui-quality/spec.md`.
+- [x] 5.3 Al archivar, sincronizar los deltas a `openspec/specs/landing/spec.md` y `openspec/specs/ui-quality/spec.md`.
