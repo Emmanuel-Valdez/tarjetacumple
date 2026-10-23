@@ -16,6 +16,7 @@
     "db:push": "drizzle-kit push",
     "photos:prepare": "node scripts/prepare-photos.mjs",
     "movies:prepare": "node scripts/prepare-movies.mjs",
+    "og:prepare": "node scripts/prepare-og.mjs",
     "db:clean": "node scripts/clean-test-data.mjs",
     "db:backup": "node scripts/backup-db.mjs"
   },

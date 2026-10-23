@@ -16,7 +16,7 @@ Manejo: `astro dev stop`, `astro dev status`, `astro dev logs`.
 
 Dos trampas:
 
-- **No lo lances con `rtk`**: el wrapper no cierra la sesión y el comando queda colgado. Ejecutalo crudo (`npx astro dev --background`).
+- **No lo lances con `rtk`**: `rtk npx astro dev --background` no cierra la sesión y deja colgada la implementación. Ejecutalo crudo (`npx astro dev --background`).
 - **El dev server bloquea `openspec/changes/`**: mantiene un handle abierto sobre esas carpetas, así que `astro dev stop` antes de mover o renombrar un change (archivar) y volvé a levantarlo después.
 
 Antes de tocar la UI, corré `npm run check` (types) y `npm run build` (SSR). El dev server ya hot-reloadea, pero el build es el que valida el output de producción.

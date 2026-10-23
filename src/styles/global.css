@@ -27,10 +27,15 @@
 
 /* Fondo único: vertical en mobile, horizontal en desktop. Se difumina al scrollear. */
 .fondo-cine {
+  --fondo: url('/img/fondo-mobile.webp');
   position: fixed;
   inset: -24px;
   z-index: -2;
-  background-image: url('/img/fondo-mobile.webp');
+  /* Scrim: viñeta central (donde se concentra el texto) + degradé vertical. */
+  background-image:
+    radial-gradient(ellipse 80% 65% at 50% 42%, rgba(10, 10, 15, 0.85) 0%, rgba(10, 10, 15, 0.55) 55%, rgba(10, 10, 15, 0) 100%),
+    linear-gradient(180deg, rgba(10, 10, 15, 0.82) 0%, rgba(10, 10, 15, 0.7) 35%, rgba(10, 10, 15, 0.78) 70%, rgba(10, 10, 15, 0.9) 100%),
+    var(--fondo);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -39,7 +44,7 @@
   transition: filter 0.6s ease;
 }
 @media (orientation: landscape) {
-  .fondo-cine { background-image: url('/img/fondo-desktop.webp'); }
+  .fondo-cine { --fondo: url('/img/fondo-desktop.webp'); }
 }
 .fondo-cine.difuminado { filter: blur(9px) brightness(0.7); }
 @media (prefers-reduced-motion: reduce) {
@@ -54,16 +59,23 @@
   pointer-events: none;
 }
 
-/* Marquesina del hero: el texto cruza la pantalla de lado a lado. */
+/* Marquesina del hero: entra, descansa centrada para leer y sale. */
 .marquee { overflow: hidden; white-space: nowrap; }
 .marquee > span {
-  display: inline-block;
-  animation: marquee 12s linear infinite;
+  display: block;
+  text-align: center;
+  animation: marquee 14s linear infinite;
 }
 @keyframes marquee {
-  from { transform: translateX(100%); }
-  to { transform: translateX(-100%); }
+  0% { transform: translateX(100%); }
+  12% { transform: translateX(0); }
+  82% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
 }
+.marquee:hover > span,
+.marquee:focus-within > span { animation-play-state: paused; }
+.marquee:focus-visible,
+.movie-row:focus-visible { outline: 2px solid var(--color-neon-cyan); outline-offset: 4px; }
 @media (prefers-reduced-motion: reduce) {
   .marquee > span { animation: none; transform: none; }
 }
@@ -83,6 +95,8 @@
   animation: movie-scroll-left 55s linear infinite;
 }
 .movie-row--right { animation-name: movie-scroll-right; }
+.movie-row:hover,
+.movie-row:focus-within { animation-play-state: paused; }
 @keyframes movie-scroll-left {
   from { transform: translateX(0); }
   to { transform: translateX(calc(-50% - 0.375rem)); }
@@ -94,6 +108,17 @@
 @media (prefers-reduced-motion: reduce) {
   .movie-row { animation: none; }
 }
+/* En tactil la fila deja de moverse sola y pasa a scroll manual con snap. */
+@media (pointer: coarse) {
+  .movie-row {
+    width: auto;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    animation: none;
+  }
+  .movie-dup { display: none; }
+  .movie-card { scroll-snap-align: start; }
+}
 
 /* Decoración parallax: pocos globos y confetis que solo se mueven con el scroll. */
 .decor {
@@ -102,10 +127,10 @@
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
+  opacity: 0.4;
 }
 .decor > * {
   position: absolute;
-  will-change: transform;
   transform: translate3d(0, calc(var(--scroll, 0) * -1px * var(--v, 0.05)), 0);
 }
 .decor-balloon { opacity: 0.75; }
