@@ -64,7 +64,7 @@ const abierto = contestStatus() === 'open';
       for (const p of candidates || []) {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'vote-candidate overflow-hidden rounded-lg border-2 border-transparent bg-[#15151c] focus:outline-none focus:ring-2 focus:ring-neon-cyan';
+        btn.className = 'vote-candidate overflow-hidden rounded-lg border-2 border-transparent bg-surface focus:outline-none focus:ring-2 focus:ring-neon-cyan';
         btn.dataset.id = String(p.id);
         btn.setAttribute('aria-pressed', 'false');
         btn.setAttribute('aria-label', p.alt || 'Votar por esta foto');
@@ -130,19 +130,25 @@ const abierto = contestStatus() === 'open';
       if (!selectedPhotoId || !renderedCategoryId) return;
       confirmBtn.disabled = true;
       errorEl.hidden = true;
-      const r = await fetch('/api/contest/vote', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ categoryId: renderedCategoryId, photoId: selectedPhotoId }),
-      });
-      if (r.ok) {
-        renderedCategoryId = null;
-        selectedPhotoId = null;
-        await refresh();
-      } else {
-        const j = await r.json().catch(() => ({}));
-        errorEl.textContent = j.error === 'ya votaste en esta categoria'
-          ? 'Ya habías votado en esta categoría.'
-          : 'No se pudo registrar el voto. Probá de nuevo.';
+      try {
+        const r = await fetch('/api/contest/vote', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ categoryId: renderedCategoryId, photoId: selectedPhotoId }),
+        });
+        if (r.ok) {
+          renderedCategoryId = null;
+          selectedPhotoId = null;
+          await refresh();
+        } else {
+          const j = await r.json().catch(() => ({}));
+          errorEl.textContent = j.error === 'ya votaste en esta categoria'
+            ? 'Ya habías votado en esta categoría.'
+            : 'No se pudo registrar el voto. Probá de nuevo.';
+          errorEl.hidden = false;
+          confirmBtn.disabled = selectedPhotoId === null;
+        }
+      } catch {
+        errorEl.textContent = 'No se pudo registrar el voto. Revisá tu conexión y probá de nuevo.';
         errorEl.hidden = false;
         confirmBtn.disabled = selectedPhotoId === null;
       }

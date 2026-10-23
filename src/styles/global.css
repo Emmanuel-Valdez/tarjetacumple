@@ -6,6 +6,11 @@
   --color-neon-cyan: #00f0ff;
   --color-neon-magenta: #ff00ff;
   --color-neon-green: #39ff14;
+  --color-surface: #15151c;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* ponytail: stack del sistema; autoalojar una display serif si los títulos piden más carácter. */
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
 }
 
 @layer base {
@@ -13,12 +18,34 @@
   body {
     background-color: var(--color-cinema-black);
     color: #e5e5e5;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: var(--font-sans);
     overflow-x: clip;
   }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
   }
+}
+
+/* Jerarquía: la sans informa, la serif narra. Título de sección y hashtag son las dos voces editoriales. */
+.titulo-seccion {
+  font-family: var(--font-serif);
+  font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--color-cinema-gold);
+  text-wrap: balance;
+}
+
+.hashtag {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 1.6rem + 2.5vw, 3rem);
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  color: var(--color-neon-green);
+  overflow-wrap: anywhere;
 }
 
 .neon-text {
@@ -59,11 +86,13 @@
   pointer-events: none;
 }
 
-/* Marquesina del hero: entra, descansa centrada para leer y sale. */
-.marquee { overflow: hidden; white-space: nowrap; }
+/* Marquesina del hero: entra, descansa centrada para leer y sale.
+   El padding deja aire para los descendentes (la "g" de "Legalmente") dentro del recorte. */
+.marquee { overflow: hidden; white-space: nowrap; padding-block: 0.14em; }
 .marquee > span {
   display: block;
   text-align: center;
+  line-height: 1.18;
   animation: marquee 14s linear infinite;
 }
 @keyframes marquee {

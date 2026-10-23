@@ -8,4 +8,5 @@ export const EVENT = {
   mapsUrl:
     'https://www.google.com/maps/place/C%C3%A1mping+Centro+De+Empleados+De+Comercio/@-32.868596,-68.7915537,17z/data=!3m1!4b1!4m6!3m5!1s0x967e08d4be4dc55d:0x7727f091af109e48!8m2!3d-32.868596!4d-68.7915537!16s%2Fg%2F11j4swknk4',
   spotifyPlaylist: '37i9dQZF1DXcBWIGoYBM5M',
+  hashtag: '#Juli30',
 } as const;
