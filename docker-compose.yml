@@ -2,8 +2,6 @@ services:
   app:
     build:
       context: .
-      args:
-        - NODE_VERSION=22
     image: juli30:local
     restart: unless-stopped
     env_file:

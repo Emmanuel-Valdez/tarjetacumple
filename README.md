@@ -12,7 +12,7 @@ Invitación web de cumpleaños con tema *fiesta en el cine*: disfraces de pelíc
 - **Docker Compose** + Nginx + Cloudflare (deploy en VPS Oracle)
 - **OpenSpec** para specs y changes (`openspec/`)
 
-Requiere Node 22.22 o superior.
+Requiere Node 22.23.4 o superior (incluye los fixes de seguridad del 21/10/2026).
 
 ## Comandos
 
