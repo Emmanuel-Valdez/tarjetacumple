@@ -226,7 +226,7 @@ const giftConfigured = Boolean(giftAlias && giftRecipient);
   <button
     id="music-toggle"
     type="button"
-    class="fixed bottom-4 right-4 z-50 flex min-h-11 items-center gap-2 rounded-full border border-neon-cyan/50 bg-gray-950/80 px-4 py-2 text-sm text-neon-cyan backdrop-blur focus:outline-none focus:ring-2 focus:ring-neon-cyan focus:ring-offset-2 focus:ring-offset-cinema-black"
+    class="fixed bottom-4 right-4 z-50 flex min-h-11 items-center gap-2 rounded-full border border-neon-cyan/50 bg-gray-950/80 px-4 py-2 text-sm text-neon-cyan backdrop-blur focus:outline-none focus:ring-2 focus:ring-neon-cyan focus:ring-offset-2 focus:ring-offset-cinema-black music-attention"
     aria-pressed="false"
     aria-label="Controlar música"
   >
@@ -513,26 +513,17 @@ const giftConfigured = Boolean(giftAlias && giftRecipient);
         });
       } catch {
         available = false;
+        btn.classList.remove('music-attention');
         render();
       }
     };
 
     loadApi();
-    setTimeout(() => { if (!player) { available = false; render(); } }, 10000);
-
-    function unmuteOnce(ev: Event) {
-      if (unmuted || !player) return;
-      if (ev.target instanceof Node && btn.contains(ev.target)) return;
-      try { player.unMute(); unmuted = true; } catch {}
-      render();
-      window.removeEventListener('pointerdown', unmuteOnce);
-      window.removeEventListener('keydown', unmuteOnce);
-    }
-    window.addEventListener('pointerdown', unmuteOnce);
-    window.addEventListener('keydown', unmuteOnce);
+    setTimeout(() => { if (!player) { available = false; btn.classList.remove('music-attention'); render(); } }, 10000);
 
     btn.addEventListener('click', () => {
       if (!available || !player) return;
+      btn.classList.remove('music-attention');
       try {
         if (!playing) { player.playVideo(); player.unMute(); unmuted = true; playing = true; }
         else if (!unmuted) { player.unMute(); unmuted = true; }
