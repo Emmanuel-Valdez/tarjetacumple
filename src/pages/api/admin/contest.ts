@@ -85,27 +85,18 @@ export const POST: APIRoute = async ({ request }) => {
     }
     // Abrir dos veces mantiene la lista congelada la primera vez.
     if (status === 'open') return Response.json({ ok: true, status: 'open' });
+    const categories = db.select().from(contestCategories).all();
+    if (categories.length === 0) {
+      return Response.json({ error: 'no hay categorias para congelar' }, { status: 409 });
+    }
     const now = new Date();
-    db.transaction((tx) => {
-      tx.insert(contestCategories)
-        .values(
-          AWARDS.map((a, i) => ({
-            slug: a.slug,
-            title: a.title,
-            emoji: a.emoji,
-            teaser: a.teaser,
-            position: i,
-          })),
-        )
-        .run();
-      tx.insert(contest)
-        .values({ id: 1, status: 'open', openedAt: now })
-        .onConflictDoUpdate({
-          target: contest.id,
-          set: { status: 'open', openedAt: now, closedAt: null },
-        })
-        .run();
-    });
+    db.insert(contest)
+      .values({ id: 1, status: 'open', openedAt: now })
+      .onConflictDoUpdate({
+        target: contest.id,
+        set: { status: 'open', openedAt: now, closedAt: null },
+      })
+      .run();
     return Response.json({ ok: true, status: 'open' });
   }
 
@@ -148,6 +139,17 @@ export const POST: APIRoute = async ({ request }) => {
   db.transaction((tx) => {
     tx.delete(contestVotes).run();
     tx.delete(contestCategories).run();
+    tx.insert(contestCategories)
+      .values(
+        AWARDS.map((a, i) => ({
+          slug: a.slug,
+          title: a.title,
+          emoji: a.emoji,
+          teaser: a.teaser,
+          position: i,
+        })),
+      )
+      .run();
     tx.insert(contest)
       .values({ id: 1, status: 'idle' })
       .onConflictDoUpdate({
