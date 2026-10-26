@@ -18,10 +18,8 @@ export const POST: APIRoute = async ({ request }) => {
   if (!parsed.success) return Response.json({ error: 'invalid data' }, { status: 400 });
   const { username, password } = parsed.data;
   const juliUser = process.env.ADMIN_JULI_USER || 'juli';
-  const orgUser = process.env.ADMIN_ORGANIZER_USER || 'organizer';
-  let role: 'juli' | 'organizer' | null = null;
-  if (username === juliUser && checkPassword('juli', password)) role = 'juli';
-  else if (username === orgUser && checkPassword('organizer', password)) role = 'organizer';
+  let role: 'juli' | null = null;
+  if (username === juliUser && checkPassword(password)) role = 'juli';
   if (!role) return Response.json({ error: 'invalid credentials' }, { status: 401 });
   const token = signSession(role);
   const res = Response.json({ ok: true, role });

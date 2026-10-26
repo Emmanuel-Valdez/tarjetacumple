@@ -1,22 +1,22 @@
 # contest Specification
 
 ## Purpose
-Night-time award contest where guests vote from their own phones for the best costumes. The organizer opens and closes the contest from the admin panel, the winners are frozen when voting ends and the public page reveals them with suspense.
+Night-time award contest where guests vote from their own phones for the best costumes. The admin opens and closes the contest from the admin panel, the winners are frozen when voting ends and the public page reveals them with suspense.
 
 ## Requirements
 
 ### Requirement: Contest starts idle
-The system SHALL keep the contest closed until Juli or the organizer opens it, hide the public vote button while it is idle, and show no candidates or voting controls on direct visits to `/votar`.
+The system SHALL keep the contest closed until Juli opens it, hide the public vote button while it is idle, and show no candidates or voting controls on direct visits to `/votar`.
 
 #### Scenario: Before the contest is opened
 - **WHEN** a visitor opens the landing page or `/votar` before voting opens
 - **THEN** no public vote button, candidate photos or voting controls are shown, and the vote view states that voting is unavailable
 
-### Requirement: Organizer opens the contest
-The system SHALL let Juli or the organizer open the award contest from the admin panel, freezing the list of award categories at that moment and making the public `/votar` view available.
+### Requirement: Admin opens the contest
+The system SHALL let Juli open the award contest from the admin panel, freezing the list of award categories at that moment and making the public `/votar` view available.
 
 #### Scenario: Opening enables voting
-- **WHEN** Juli or the organizer opens the contest
+- **WHEN** Juli opens the contest
 - **THEN** the landing page exposes the vote button and visitors can vote in `/votar`
 
 #### Scenario: Categories are frozen
@@ -64,11 +64,11 @@ The system SHALL NOT show the per-photo vote tally to visitors while the contest
 - **WHEN** a visitor views the candidate photos while the contest is open
 - **THEN** no vote count is displayed for any candidate
 
-### Requirement: Organizer closes the contest
-The system SHALL let Juli or the organizer close the contest, which stops all voting and freezes the winner of each category.
+### Requirement: Admin closes the contest
+The system SHALL let Juli close the contest, which stops all voting and freezes the winner of each category.
 
 #### Scenario: Closing stops voting
-- **WHEN** Juli or the organizer closes the contest
+- **WHEN** Juli closes the contest
 - **THEN** `/votar` no longer accepts votes and the public vote button disappears from the landing page
 
 #### Scenario: Winners are frozen

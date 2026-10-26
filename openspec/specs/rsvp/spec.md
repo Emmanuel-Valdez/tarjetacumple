@@ -64,13 +64,9 @@ The system SHALL give the RSVP modal an accessible name that identifies it as th
 - **WHEN** the visitor closes the modal
 - **THEN** the focus returns to the control that opened it
 
-### Requirement: Dedication privacy
-The system SHALL store dedications but SHALL NOT display them to Juli's account.
+### Requirement: Dedication visibility
+The system SHALL store dedications and display them to the admin (Juli).
 
-#### Scenario: Organizer sees dedications
-- **WHEN** the organizer logs in
-- **THEN** dedications are visible
-
-#### Scenario: Juli does not see dedications
+#### Scenario: Juli sees dedications
 - **WHEN** Juli logs in
-- **THEN** dedications are not visible
+- **THEN** dedications are visible

@@ -77,7 +77,7 @@ The system SHALL show only two preview categories and a sentence stating that mo
 - **THEN** the two preview categories are visible before voting opens and all ten categories are visible once voting opens
 
 #### Scenario: Full categories revealed when voting opens
-- **WHEN** an organizer or Juli opens voting
+- **WHEN** Juli opens voting
 - **THEN** the awards section shows all ten categories and the public vote button
 
 #### Scenario: No organizer instructions
@@ -217,7 +217,7 @@ The system SHALL provide a link from the awards section to the separate `/votar`
 - **THEN** no link or button to vote is displayed
 
 #### Scenario: Button is visible
-- **WHEN** an organizer or Juli has opened voting
+- **WHEN** Juli has opened voting
 - **THEN** the awards section displays a button that opens `/votar`
 
 #### Scenario: Button navigates

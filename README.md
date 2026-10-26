@@ -85,10 +85,9 @@ Los invitados votan en `/votar`, una foto por categoría, con la cookie anónima
 
 **Antes del evento**: ajustar `src/data/awards.ts`, hacer deploy y subir las fotos candidatas desde `/admin`. La noche del evento todo se maneja desde el panel.
 
-## Roles del panel
+## Rol del panel
 
-- **Juli** (`juli`): RSVPs, canciones, fotos y concurso. No ve dedicatorias.
-- **Organizadora** (`organizer`): lo mismo + dedicatorias, para el video.
+- **Juli** (`juli`): RSVPs (incluye dedicatorias), canciones, fotos y concurso.
 
 ## Variables de entorno
 
@@ -98,7 +97,6 @@ Copiá `.env.example` a `.env`.
 |---|---|
 | `SESSION_SECRET` | Firma las cookies de sesión (HMAC). **Obligatorio en producción**; generá con `openssl rand -hex 32`. |
 | `ADMIN_JULI_USER` / `ADMIN_JULI_PASSWORD` | Login de Juli |
-| `ADMIN_ORGANIZER_USER` / `ADMIN_ORGANIZER_PASSWORD` | Login de la organizadora |
 | `GIFT_ALIAS` / `GIFT_RECIPIENT` / `GIFT_ACCOUNT` | Datos de regalos (opcionales; sin alias y destinatario se muestra un placeholder) |
 | `PUBLIC_SITE_URL` | URL pública para las etiquetas Open Graph |
 | `DATABASE_PATH` | Ruta del SQLite (prod: `/data/db.sqlite`) |

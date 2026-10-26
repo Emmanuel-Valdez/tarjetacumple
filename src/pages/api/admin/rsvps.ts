@@ -17,7 +17,7 @@ export const GET: APIRoute = async ({ request }) => {
     id: r.id,
     name: r.name,
     companions: r.companions,
-    dedication: role === 'organizer' ? r.dedication : null,
+    dedication: r.dedication,
     createdAt: r.createdAt,
   }));
   return Response.json({ role, rsvps: data });

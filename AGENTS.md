@@ -43,7 +43,7 @@ Antes de tocar la UI, corré `npm run check` (tipos) y `npm run build` (SSR). El
 
 - `SESSION_SECRET` es obligatorio en producción: `src/lib/auth.ts` tira error si falta o es el valor de dev.
 - Cookies de sesión: httpOnly, SameSite=Lax, `Secure` cuando `NODE_ENV=production`.
-- Dos roles: `juli` (no ve dedicatorias) y `organizer` (las ve).
+- Un único rol admin: `juli` (ve dedicatorias).
 - Rate limiting en login (`rateLimit` en `src/lib/auth.ts`).
 
 ## OpenSpec

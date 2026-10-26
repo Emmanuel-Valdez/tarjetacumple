@@ -1,18 +1,14 @@
 ## Purpose
 
-Admin panel with dual authentication for managing RSVPs, photos and dedications.
+Admin panel with authentication for managing RSVPs, photos and dedications.
 
 ## Requirements
 
-### Requirement: Dual login
-The system SHALL support two admin accounts: one for Juli and one for the organizer.
+### Requirement: Admin login
+The system SHALL support a single admin account for Juli.
 
 #### Scenario: Juli login
 - **WHEN** Juli logs in with her credentials
-- **THEN** she accesses the admin panel
-
-#### Scenario: Organizer login
-- **WHEN** the organizer logs in with her credentials
 - **THEN** she accesses the admin panel
 
 ### Requirement: RSVP management
@@ -63,42 +59,34 @@ The system SHALL let admins list and delete the songs guests added to the playli
 - **WHEN** an admin deletes a song
 - **THEN** it no longer appears in the public playlist
 
-### Requirement: Dedication visibility by role
-The system SHALL show dedications only to the organizer, not to Juli.
+### Requirement: Dedication visibility
+The system SHALL show dedications to the admin (Juli).
 
-#### Scenario: Organizer sees dedications
-- **WHEN** the organizer views RSVPs
+#### Scenario: Juli sees dedications
+- **WHEN** Juli views RSVPs
 - **THEN** dedications are displayed
 
-#### Scenario: Juli cannot see dedications
-- **WHEN** Juli views RSVPs
-- **THEN** dedications are hidden
-
 ### Requirement: Contest controls
-The system SHALL let Juli and the organizer open and close the award contest from their authenticated admin panel sessions.
+The system SHALL let Juli open and close the award contest from her authenticated admin panel session.
 
 #### Scenario: Juli opens the contest
 - **WHEN** Juli opens the contest
 - **THEN** voting is enabled for visitors and the award categories are frozen
 
-#### Scenario: Organizer opens the contest
-- **WHEN** the organizer opens the contest
-- **THEN** voting is enabled for visitors and the award categories are frozen
-
 #### Scenario: Open the contest
-- **WHEN** either admin role opens the contest
+- **WHEN** the admin opens the contest
 - **THEN** voting is enabled for visitors and the award categories are frozen
 
 #### Scenario: Close the contest
-- **WHEN** either admin role closes the contest
+- **WHEN** the admin closes the contest
 - **THEN** voting is disabled and the winners are calculated and frozen
 
 #### Scenario: Closed contest cannot be reopened
-- **WHEN** either role tries to open a contest that was already closed
+- **WHEN** the admin tries to open a contest that was already closed
 - **THEN** the request is rejected and the winners stay frozen
 
 #### Scenario: Closing asks for confirmation
-- **WHEN** either role triggers the close action
+- **WHEN** the admin triggers the close action
 - **THEN** a confirmation is shown explaining that the contest cannot be reopened, and the contest stays open until confirmed
 
 ### Requirement: Contest reset

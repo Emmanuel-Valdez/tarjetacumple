@@ -1,7 +1,7 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import './env';
 
-export type Role = 'juli' | 'organizer';
+export type Role = 'juli';
 
 const DEV_SECRET = 'dev-secret-change-me';
 
@@ -16,10 +16,8 @@ const secret = (() => {
 
 export const isSecure = process.env.NODE_ENV === 'production';
 
-export function checkPassword(role: Role, password: string): boolean {
-  const envPass = role === 'juli'
-    ? process.env.ADMIN_JULI_PASSWORD
-    : process.env.ADMIN_ORGANIZER_PASSWORD;
+export function checkPassword(password: string): boolean {
+  const envPass = process.env.ADMIN_JULI_PASSWORD;
   if (!envPass) return false;
   const a = Buffer.from(password);
   const b = Buffer.from(envPass);
@@ -38,7 +36,7 @@ export function verifySession(token: string | undefined): Role | null {
   const parts = token.split('.');
   if (parts.length !== 3) return null;
   const [role, exp, sig] = parts;
-  if (role !== 'juli' && role !== 'organizer') return null;
+  if (role !== 'juli') return null;
   const expected = createHmac('sha256', secret).update(`${role}.${exp}`).digest('hex');
   if (sig !== expected) return null;
   if (Date.now() > Number(exp)) return null;
